@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+Use a single catalog image-key adapter in `src/lib/products.ts` for current editorial placeholders; replace it with per-product media URLs from the catalog API later so every storefront view remains consistent.

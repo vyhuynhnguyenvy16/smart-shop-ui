@@ -34,6 +34,8 @@ export const Route = createFileRoute("/products/")({
         property: "og:description",
         content: "Filter and sort the full Northline range: audio, footwear, bags and watches.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProductListing,

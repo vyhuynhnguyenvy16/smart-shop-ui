@@ -15,6 +15,8 @@ export function Header() {
   const [suggestions, setSuggestions] = useState<Product[]>([]);
 
   useEffect(() => {
+    // API TÌM KIẾM: GET /products?search=q&size=5 (hoặc /search/suggest?q=...);
+    // debounce và trả kết quả từ server; hiện tải 20 sản phẩm rồi lọc trong trình duyệt.
     const q = query.trim().toLowerCase();
     if (!q) {
       setSuggestions([]);

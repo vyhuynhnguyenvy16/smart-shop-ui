@@ -25,6 +25,8 @@ export const Route = createFileRoute("/products/$slug")({
           { name: "description", content: loaderData.product.description },
           { property: "og:title", content: loaderData.product.title },
           { property: "og:description", content: loaderData.product.description },
+           { property: "og:type", content: "product" },
+           { name: "twitter:card", content: "summary_large_image" },
         ]
       : [],
   }),
@@ -39,6 +41,8 @@ function ProductDetail() {
   const navigate = useNavigate();
   const { related } = product;
   const currentProduct = product.product;
+  // API GALLERY: GET /products/:slug cần trả images[] của đúng sản phẩm,
+  // có ảnh từng màu/size nếu khác nhau. Hiện chỉ lặp ảnh danh mục minh họa.
   const gallery = [
     currentProduct.image,
     currentProduct.image,
@@ -188,6 +192,8 @@ function ProductDetail() {
       <section className="container-shop section-y pt-0">
         <h2 className="text-2xl font-semibold text-foreground">Customer reviews</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
+          {/* API ĐÁNH GIÁ: GET /products/:slug/reviews?page=... trả sao, nội dung,
+              người mua đã xác minh và tổng số đánh giá; dữ liệu dưới đây là minh họa. */}
           {[
             { n: "Mai T.", t: "Exactly as pictured, arrived in two days." },
             { n: "David L.", t: "Great build quality for the price. Would buy again." },
