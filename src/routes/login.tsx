@@ -11,6 +11,8 @@ export const Route = createFileRoute("/login")({
       { name: "description", content: "Đăng nhập Northline để theo dõi đơn hàng và địa chỉ." },
       { property: "og:title", content: "Đăng nhập — Northline" },
       { property: "og:description", content: "Đăng nhập tài khoản Northline của bạn." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LoginPage,

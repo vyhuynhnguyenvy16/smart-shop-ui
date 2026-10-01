@@ -19,6 +19,8 @@ export const Route = createFileRoute("/admin/products")({
         property: "og:description",
         content: "CRUD products with variants and inventory tracking.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminProducts,

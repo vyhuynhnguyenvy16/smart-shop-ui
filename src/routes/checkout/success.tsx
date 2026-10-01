@@ -12,6 +12,8 @@ export const Route = createFileRoute("/checkout/success")({
       { name: "description", content: "Đơn hàng Northline của bạn đã được tạo thành công." },
       { property: "og:title", content: "Đặt hàng thành công — Northline" },
       { property: "og:description", content: "Cảm ơn bạn đã mua sắm tại Northline." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SuccessPage,

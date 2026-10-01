@@ -14,6 +14,8 @@ export const Route = createFileRoute("/orders/$id")({
       { name: "description", content: "Xem chi tiết đơn hàng, địa chỉ giao và trạng thái." },
       { property: "og:title", content: "Chi tiết đơn hàng — Northline" },
       { property: "og:description", content: "Chi tiết sản phẩm, thanh toán và trạng thái đơn." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: OrderDetailPage,

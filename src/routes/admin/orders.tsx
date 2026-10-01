@@ -25,6 +25,8 @@ export const Route = createFileRoute("/admin/orders")({
         property: "og:description",
         content: "Review orders and move them through the fulfilment states.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminOrders,
