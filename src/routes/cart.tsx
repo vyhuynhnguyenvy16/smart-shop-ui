@@ -21,6 +21,8 @@ export const Route = createFileRoute("/cart")({
         property: "og:description",
         content: "Review items and check out as a guest in three steps.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CartPage,

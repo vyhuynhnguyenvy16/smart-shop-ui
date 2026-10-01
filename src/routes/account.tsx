@@ -24,6 +24,8 @@ export const Route = createFileRoute("/account")({
       },
       { property: "og:title", content: "Tài khoản — Northline" },
       { property: "og:description", content: "Lịch sử đơn hàng, hồ sơ và sổ địa chỉ." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AccountPage,

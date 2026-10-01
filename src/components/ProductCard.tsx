@@ -16,6 +16,8 @@ export function ProductCard({
   onQuickView?: (p: Product) => void;
 }) {
   const [wished, setWished] = useState(false);
+  // API WISHLIST (nếu bật lưu): GET /wishlist, POST /wishlist/:productId,
+  // DELETE /wishlist/:productId; hiện chỉ là state tạm, mất khi tải lại.
   const out = product.stock === "out";
 
   return (

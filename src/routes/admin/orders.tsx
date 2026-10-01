@@ -25,6 +25,8 @@ export const Route = createFileRoute("/admin/orders")({
         property: "og:description",
         content: "Review orders and move them through the fulfilment states.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminOrders,
@@ -35,11 +37,15 @@ function AdminOrders() {
   const [filter, setFilter] = useState<OrderStatus | "all">("all");
 
   useEffect(() => {
+    // API QUẢN TRỊ GET /admin/orders?page,size,status: server xác thực admin;
+    // getOrderPage hiện chỉ đọc đơn của tài khoản đang đăng nhập.
     void getOrderPage().then((page) => setOrders(page.content));
   }, []);
 
   const rows = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
+  // API QUẢN TRỊ PATCH /admin/orders/:id/status: kiểm tra quyền và chuyển trạng thái
+  // hợp lệ ở server; hiện dropdown chỉ thay state cục bộ, không lưu vào database.
   const update = (id: string, status: OrderStatus) =>
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
 

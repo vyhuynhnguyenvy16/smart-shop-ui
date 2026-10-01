@@ -3,10 +3,10 @@ import { Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { CATEGORIES, getProducts } from "@/lib/products";
-import hero from "@/assets/p-headphones.jpg";
-import sneakers from "@/assets/p-sneakers.jpg";
-import backpack from "@/assets/p-backpack.jpg";
-import watch from "@/assets/p-watch.jpg";
+import hero from "@/assets/fashion-audio.webp";
+import sneakers from "@/assets/fashion-footwear.webp";
+import backpack from "@/assets/fashion-bags.webp";
+import watch from "@/assets/fashion-watches.webp";
 
 export const Route = createFileRoute("/")({
   loader: () => getProducts({ page: 0, size: 4 }),
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Curated audio, footwear, bags and watches with free shipping over $50.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -73,7 +75,7 @@ function Home() {
           </div>
           <img
             src={hero}
-            alt="Studio wireless noise-cancelling headphones"
+            alt="Northline editorial look with wireless headphones and tailored separates"
             width={1024}
             height={1024}
             className="mx-auto w-full max-w-md rounded-xl object-cover shadow-[var(--shadow-card)]"

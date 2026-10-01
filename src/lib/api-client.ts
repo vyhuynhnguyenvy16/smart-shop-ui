@@ -1,5 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * ĐIỂM NỐI API THẬT (đang dùng Lovable Cloud, không phải mock HTTP):
+ * Auth: signUp / signInWithPassword / signOut / getUser (email, password, session).
+ * Account: GET/PATCH profile; GET/POST/PATCH/DELETE addresses (theo user).
+ * Catalog: GET categories, GET products?page,size,filters,sort, GET products/:slug;
+ *          sản phẩm trả variants(id, sku, color, size, price, stock), imageUrl/images[].
+ * Cart: GET cart, POST item, PATCH item quantity, DELETE item (session hiện tại).
+ * Orders: POST checkout, GET orders, GET orders/:id, PATCH cancel (chỉ đơn pending).
+ * Khi thay dịch vụ khác: giữ nguyên các kiểu response và hàm export dưới đây để UI
+ * không phải đổi; truyền session an toàn, không nhúng khóa quản trị vào trình duyệt.
+ */
+
 export type VariantResponse = {
   id: number;
   sku: string;
@@ -248,6 +260,7 @@ export async function deleteAddress(id: string) {
 
 /* -------------------------------- Products -------------------------------- */
 
+// API CATALOG: bổ sung imageUrl/images[] và ảnh riêng của variant tại đây khi có media API.
 const PRODUCT_SELECT =
   "id, name, slug, description, base_price, compare_at_price, status, image_key, rating, reviews_count, badge, category_id, created_at, categories(name), product_variants(id, sku, color, size, price, stock)";
 
@@ -308,6 +321,7 @@ export async function getProductsPage(params?: {
   sortBy?: string;
   sortDirection?: string;
 }): Promise<PageResponse<ProductResponse>> {
+  // API GET /products: gửi page, size, categoryId, price, search, sort; nhận content + totalElements.
   const page = params?.page ?? 0;
   const size = params?.size ?? 12;
   let query = supabase.from("products").select(PRODUCT_SELECT, { count: "exact" });
@@ -350,6 +364,7 @@ export async function getProductById(id: number) {
 }
 
 export async function getProductBySlugRaw(slug: string) {
+  // API GET /products/:slug: nhận chi tiết, tồn kho theo biến thể và mảng ảnh gallery.
   const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
@@ -411,6 +426,7 @@ function mapCartRow(row: CartRow): CartItemResponse {
 }
 
 export async function getCart(): Promise<CartResponse> {
+  // API GET /cart: trả các dòng hàng theo phiên người dùng, kèm giá/tồn kho mới nhất.
   const userId = await getSessionUserId();
   if (!userId) return { id: 0, items: [], totalAmount: 0 };
   const { data, error } = await supabase
@@ -423,6 +439,7 @@ export async function getCart(): Promise<CartResponse> {
 }
 
 export async function addCartItem(variantId: number, quantity = 1) {
+  // API POST /cart/items: variantId + quantity; server phải kiểm tra stock/giá thực.
   const userId = await requireUserId();
   const { data: existing } = await supabase
     .from("cart_items")
@@ -515,6 +532,11 @@ export async function createOrder(body: {
   paymentMethod?: string;
   shippingFee?: number;
 }) {
+  // API POST /checkout: thực tế cần một giao dịch server duy nhất để kiểm tồn kho,
+  // tính lại tiền/thuế/vận chuyển, tạo order + items và xóa cart nguyên tử.
+  // API POST /payments/session + webhook xác thực chữ ký để xác nhận thanh toán;
+  // TUYỆT ĐỐI không gửi dữ liệu thẻ hay tự đánh dấu đã trả tiền từ client.
+  // Luồng hiện tại chỉ tạo đơn và ghi payment_method, chưa thu tiền online.
   const userId = await requireUserId();
   const cart = await getCart();
   if (cart.items.length === 0) fail("Giỏ hàng của bạn đang trống.");
@@ -563,6 +585,7 @@ export async function createOrder(body: {
 }
 
 export async function getOrders(params?: { page?: number; size?: number }) {
+  // API GET /orders?page,size: server lọc theo user hoặc kiểm tra quyền admin.
   const page = params?.page ?? 0;
   const size = params?.size ?? 20;
   const { data, error, count } = await supabase

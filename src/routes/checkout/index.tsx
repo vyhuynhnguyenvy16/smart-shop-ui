@@ -21,6 +21,8 @@ export const Route = createFileRoute("/checkout/")({
         property: "og:description",
         content: "Fast, secure three-step guest checkout at Northline.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CheckoutPage,
@@ -61,6 +63,9 @@ function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({});
   const [shipping, setShipping] = useState("standard");
   const [payment, setPayment] = useState("card");
+  // API THANH TOÁN: card/PayPal chỉ là lựa chọn giao diện. Khi tích hợp cổng thật,
+  // POST /payments/session trả redirect/client token và webhook xác nhận giao dịch;
+  // không thu thập hoặc lưu số thẻ tại đây. Chưa có thanh toán online thực tế.
   const [payError, setPayError] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
 

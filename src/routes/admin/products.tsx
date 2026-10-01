@@ -19,6 +19,8 @@ export const Route = createFileRoute("/admin/products")({
         property: "og:description",
         content: "CRUD products with variants and inventory tracking.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AdminProducts,
@@ -47,6 +49,8 @@ function AdminProducts() {
   const defaultImage = rows[0]?.image ?? "";
 
   useEffect(() => {
+    // API QUẢN TRỊ GET /admin/products: trả danh sách + variants(stock,sku,giá) thực;
+    // endpoint phải xác thực quyền admin ở server, không dựa vào giao diện này.
     void getProducts({ page: 0, size: 100 }).then((items) => {
       setRows(
         items.map((p) => ({
@@ -82,6 +86,9 @@ function AdminProducts() {
   }
 
   function save() {
+    // API QUẢN TRỊ POST /admin/products hoặc PATCH /admin/products/:id:
+    // lưu tên, danh mục, giá, ảnh upload/URL và variants(id,sku,color,size,stock).
+    // Hiện chỉ cập nhật state trên trang; tải lại sẽ mất thay đổi.
     if (!title.trim()) return setError("Product name is required.");
     if (!price.trim() || Number.isNaN(Number(price))) return setError("Enter a valid price.");
     const cleaned = variants.filter((v) => v.name.trim());
@@ -163,6 +170,8 @@ function AdminProducts() {
                     <Button variant="secondary" size="sm" onClick={() => openEdit(r)}>
                       <Pencil /> Edit
                     </Button>
+                    {/* API QUẢN TRỊ DELETE /admin/products/:id: xác thực admin,
+                        kiểm tra đơn liên quan trước khi xóa; hiện chỉ xóa khỏi state. */}
                     <Button
                       variant="destructive"
                       size="sm"

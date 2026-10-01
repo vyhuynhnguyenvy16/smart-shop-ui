@@ -1,7 +1,7 @@
-import headphones from "@/assets/p-headphones.jpg";
-import sneakers from "@/assets/p-sneakers.jpg";
-import backpack from "@/assets/p-backpack.jpg";
-import watch from "@/assets/p-watch.jpg";
+import headphones from "@/assets/fashion-audio.webp";
+import sneakers from "@/assets/fashion-footwear.webp";
+import backpack from "@/assets/fashion-bags.webp";
+import watch from "@/assets/fashion-watches.webp";
 import {
   getCategories,
   getProductById as fetchProductById,
@@ -43,6 +43,10 @@ export const CATEGORIES = [
   "Deals",
 ] as const;
 
+// API ẢNH SẢN PHẨM: image_key hiện là khóa ảnh minh họa dùng chung theo danh mục.
+// Khi nối catalog thật, GET /products và GET /products/:slug cần trả imageUrl và
+// images[] (URL CDN 800px+ cho từng sản phẩm/biến thể); thay imageForKey bằng URL đó.
+// Đơn hàng cần giữ ảnh snapshot để ảnh trong lịch sử không đổi khi catalog cập nhật.
 export const productImages: Record<string, string> = {
   headphones,
   footwear: sneakers,
