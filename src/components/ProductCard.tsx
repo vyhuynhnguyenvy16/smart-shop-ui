@@ -88,7 +88,7 @@ export function ProductCard({
         variant="primary"
         size="md"
         disabled={out}
-        onClick={() => addToCart(product.id)}
+        onClick={() => void addToCart(product.variants.find((v) => v.stock > 0)?.id ?? product.id)}
         className="mt-4 w-full"
       >
         <ShoppingCart /> {out ? "Out of Stock" : "Add to Cart"}
