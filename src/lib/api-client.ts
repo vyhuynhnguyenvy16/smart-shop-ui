@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { fashionCategories, fashionProducts } from "./fashion-catalog";
 
 /**
  * ĐIỂM NỐI API THẬT (đang dùng Lovable Cloud, không phải mock HTTP):
@@ -321,6 +322,21 @@ export async function getProductsPage(params?: {
   sortBy?: string;
   sortDirection?: string;
 }): Promise<PageResponse<ProductResponse>> {
+  // Editorial catalog stays available while the remote catalog is not provisioned.
+  let items = fashionProducts.filter((item) =>
+    (params?.categoryId === undefined || item.categoryId === params.categoryId) &&
+    (params?.minPrice === undefined || item.basePrice >= params.minPrice) &&
+    (params?.maxPrice === undefined || item.basePrice <= params.maxPrice) &&
+    (!params?.search || item.name.toLowerCase().includes(params.search.toLowerCase()))
+  );
+  items = [...items].sort((a,b) => params?.sortBy === "basePrice"
+    ? (params?.sortDirection === "desc" ? b.basePrice-a.basePrice : a.basePrice-b.basePrice)
+    : (params?.sortDirection === "desc" ? b.id-a.id : a.id-b.id));
+  const localPage = params?.page ?? 0;
+  const localSize = params?.size ?? 12;
+  const content = items.slice(localPage * localSize, (localPage + 1) * localSize);
+  const totalPages = Math.max(1, Math.ceil(items.length / localSize));
+  return { content: content as ProductResponse[], totalElements: items.length, totalPages, size: localSize, number: localPage, first: localPage === 0, last: localPage >= totalPages - 1, numberOfElements: content.length, empty: content.length === 0 };
   // API GET /products: gửi page, size, categoryId, price, search, sort; nhận content + totalElements.
   const page = params?.page ?? 0;
   const size = params?.size ?? 12;
@@ -354,6 +370,8 @@ export async function getProducts(params?: Parameters<typeof getProductsPage>[0]
 }
 
 export async function getProductById(id: number) {
+  const local = fashionProducts.find((item) => item.id === id);
+  if (local) return local as ProductResponse;
   const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
@@ -364,6 +382,8 @@ export async function getProductById(id: number) {
 }
 
 export async function getProductBySlugRaw(slug: string) {
+  const local = fashionProducts.find((item) => item.slug === slug);
+  if (local) return local as ProductResponse;
   // API GET /products/:slug: nhận chi tiết, tồn kho theo biến thể và mảng ảnh gallery.
   const { data, error } = await supabase
     .from("products")
@@ -375,6 +395,7 @@ export async function getProductBySlugRaw(slug: string) {
 }
 
 export async function getCategories(): Promise<CategoryResponse[]> {
+  return fashionCategories;
   const { data, error } = await supabase.from("categories").select("*").order("id");
   if (error) fail(error.message);
   return (data ?? []).map((row) => ({
