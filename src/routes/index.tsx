@@ -3,25 +3,25 @@ import { Star, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { CATEGORIES, getProducts } from "@/lib/products";
-import hero from "@/assets/fashion-audio.webp";
-import sneakers from "@/assets/fashion-footwear.webp";
-import backpack from "@/assets/fashion-bags.webp";
-import watch from "@/assets/fashion-watches.webp";
+import hero from "@/assets/fashion-apparel-1.webp";
+import sneakers from "@/assets/fashion-shoes-1.webp";
+import backpack from "@/assets/fashion-accessories-1.webp";
+import watch from "@/assets/fashion-outerwear-1.webp";
 
 export const Route = createFileRoute("/")({
-  loader: () => getProducts({ page: 0, size: 4 }),
+  loader: () => getProducts({ page: 0, size: 8 }),
   head: () => ({
     meta: [
-      { title: "Northline — Everyday Gear, Free Shipping Over $50" },
+      { title: "Northline — Modern Fashion & Everyday Style" },
       {
         name: "description",
         content:
-          "Shop audio, footwear, bags and watches at Northline. Free shipping over $50, 30-day free returns and secure guest checkout.",
+          "Shop clothing, outerwear, denim, dresses, shoes, bags and accessories at Northline.",
       },
-      { property: "og:title", content: "Northline — Everyday Gear" },
+      { property: "og:title", content: "Northline — Modern Fashion" },
       {
         property: "og:description",
-        content: "Curated audio, footwear, bags and watches with free shipping over $50.",
+        content: "Discover modern clothing, shoes and accessories at Northline.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,10 +31,13 @@ export const Route = createFileRoute("/")({
 });
 
 const categoryImages: Record<string, string> = {
-  Audio: hero,
-  Footwear: sneakers,
+  Clothing: hero,
+  Outerwear: watch,
+  Denim: hero,
+  Dresses: hero,
+  Shoes: sneakers,
   Bags: backpack,
-  Watches: watch,
+  Accessories: backpack,
 };
 
 function Home() {
@@ -42,17 +45,19 @@ function Home() {
 
   return (
     <>
-      <section className="border-b border-border bg-card">
-        <div className="container-shop grid items-center gap-8 py-12 md:grid-cols-2 md:py-16">
-          <div>
+      <section className="relative min-h-[460px] overflow-hidden bg-card md:min-h-[530px]">
+        <img src={hero} alt="Northline fashion editorial in a crisp white shirt" width={768} height={768} className="absolute inset-0 h-full w-full object-cover object-top md:object-center" />
+        <div className="absolute inset-0 bg-foreground/35" />
+        <div className="container-shop relative flex min-h-[460px] items-center py-12 md:min-h-[530px]">
+          <div className="max-w-xl text-primary-foreground">
             <p className="mb-4 inline-flex items-center gap-2 rounded-md bg-success/10 px-2 py-1 text-sm font-semibold text-success">
               <Star className="h-4 w-4 fill-success" /> 4.8/5 from 12,400+ customers
             </p>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
-              Gear that earns its place in your day
+            <h1 className="text-4xl font-bold leading-tight text-primary-foreground md:text-5xl">
+              Northline
             </h1>
-            <p className="mt-4 max-w-md text-base text-muted-foreground">
-              Tested essentials, honest prices, free shipping over $50 and 30-day free returns.
+            <p className="mt-4 max-w-md text-base text-primary-foreground">
+              Modern pieces made for every day. Discover clothing, shoes and accessories worth keeping.
             </p>
             <div className="mt-8">
               <Button variant="primary" size="md" asChild className="w-full sm:w-auto">
@@ -61,7 +66,7 @@ function Home() {
                 </Link>
               </Button>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-primary-foreground">
               <li className="flex items-center gap-2">
                 <Truck className="h-4 w-4 text-success" /> Free shipping over $50
               </li>
@@ -73,20 +78,13 @@ function Home() {
               </li>
             </ul>
           </div>
-          <img
-            src={hero}
-            alt="Northline editorial look with wireless headphones and tailored separates"
-            width={1024}
-            height={1024}
-            className="mx-auto w-full max-w-md rounded-xl object-cover shadow-[var(--shadow-card)]"
-          />
         </div>
       </section>
 
       <section className="container-shop section-y">
         <h2 className="text-2xl font-semibold text-foreground">Shop by category</h2>
         <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4">
-          {CATEGORIES.slice(0, 4).map((c) => (
+          {CATEGORIES.filter((c) => ["Clothing", "Outerwear", "Shoes", "Bags"].includes(c)).map((c) => (
             <Link
               key={c}
               to="/products"

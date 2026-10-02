@@ -1,7 +1,19 @@
-import headphones from "@/assets/fashion-audio.webp";
-import sneakers from "@/assets/fashion-footwear.webp";
-import backpack from "@/assets/fashion-bags.webp";
-import watch from "@/assets/fashion-watches.webp";
+import apparel1 from "@/assets/fashion-apparel-1.webp";
+import apparel2 from "@/assets/fashion-apparel-2.webp";
+import apparel3 from "@/assets/fashion-apparel-3.webp";
+import apparel4 from "@/assets/fashion-apparel-4.webp";
+import outerwear1 from "@/assets/fashion-outerwear-1.webp";
+import outerwear2 from "@/assets/fashion-outerwear-2.webp";
+import outerwear3 from "@/assets/fashion-outerwear-3.webp";
+import outerwear4 from "@/assets/fashion-outerwear-4.webp";
+import accessories1 from "@/assets/fashion-accessories-1.webp";
+import accessories2 from "@/assets/fashion-accessories-2.webp";
+import accessories3 from "@/assets/fashion-accessories-3.webp";
+import accessories4 from "@/assets/fashion-accessories-4.webp";
+import shoes1 from "@/assets/fashion-shoes-1.webp";
+import shoes2 from "@/assets/fashion-shoes-2.webp";
+import shoes3 from "@/assets/fashion-shoes-3.webp";
+import shoes4 from "@/assets/fashion-shoes-4.webp";
 import {
   getCategories,
   getProductById as fetchProductById,
@@ -33,29 +45,21 @@ export type Product = {
   createdAt: string;
 };
 
-export const CATEGORIES = [
-  "Audio",
-  "Footwear",
-  "Bags",
-  "Watches",
-  "Home",
-  "Fitness",
-  "Deals",
-] as const;
+export const CATEGORIES = ["Clothing", "Outerwear", "Denim", "Dresses", "Shoes", "Bags", "Accessories"] as const;
 
 // API ẢNH SẢN PHẨM: image_key hiện là khóa ảnh minh họa dùng chung theo danh mục.
 // Khi nối catalog thật, GET /products và GET /products/:slug cần trả imageUrl và
 // images[] (URL CDN 800px+ cho từng sản phẩm/biến thể); thay imageForKey bằng URL đó.
 // Đơn hàng cần giữ ảnh snapshot để ảnh trong lịch sử không đổi khi catalog cập nhật.
 export const productImages: Record<string, string> = {
-  headphones,
-  footwear: sneakers,
-  bags: backpack,
-  watches: watch,
+  "apparel-1": apparel1, "apparel-2": apparel2, "apparel-3": apparel3, "apparel-4": apparel4,
+  "outerwear-1": outerwear1, "outerwear-2": outerwear2, "outerwear-3": outerwear3, "outerwear-4": outerwear4,
+  "accessories-1": accessories1, "accessories-2": accessories2, "accessories-3": accessories3, "accessories-4": accessories4,
+  "shoes-1": shoes1, "shoes-2": shoes2, "shoes-3": shoes3, "shoes-4": shoes4,
 };
 
 export function imageForKey(key: string | undefined) {
-  return productImages[key ?? "headphones"] ?? headphones;
+  return productImages[key ?? "apparel-1"] ?? apparel1;
 }
 
 export function adaptProduct(product: ProductResponse): Product {

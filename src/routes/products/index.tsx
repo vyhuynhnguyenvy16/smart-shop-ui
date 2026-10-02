@@ -32,7 +32,7 @@ export const Route = createFileRoute("/products/")({
       { property: "og:title", content: "All Products — Northline" },
       {
         property: "og:description",
-        content: "Filter and sort the full Northline range: audio, footwear, bags and watches.",
+        content: "Filter and sort Northline clothing, shoes, bags and accessories.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -78,14 +78,14 @@ function ProductListing() {
           maxPrice,
           sortBy: sort === "Price: Low-High" ? "basePrice" : "createdAt",
           sortDirection: sort === "Price: Low-High" ? "asc" : "desc",
+          ...(q ? { search: q } : {}),
           ...(categoryId === undefined ? {} : { categoryId }),
         };
         const response = await getProductsPage(productParams);
         if (!active) return;
-        const query = q?.toLowerCase().trim();
-        const filtered = query
-          ? response.content.filter((item) => item.title.toLowerCase().includes(query))
-          : response.content;
+        const filtered = response.content.filter((item) =>
+          (cats.length <= 1 || cats.includes(item.category)) && item.rating >= minRating,
+        );
         setList(inStockOnly ? filtered.filter((item) => item.stock !== "out") : filtered);
         setTotal(response.totalElements);
         setPageCount(Math.max(1, response.totalPages));
