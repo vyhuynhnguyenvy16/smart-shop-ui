@@ -322,6 +322,7 @@ export async function getProductsPage(params?: {
   sortBy?: string;
   sortDirection?: string;
 }): Promise<PageResponse<ProductResponse>> {
+  {
   // Editorial catalog stays available while the remote catalog is not provisioned.
   let items = fashionProducts.filter((item) =>
     (params?.categoryId === undefined || item.categoryId === params.categoryId) &&
@@ -337,6 +338,7 @@ export async function getProductsPage(params?: {
   const content = items.slice(localPage * localSize, (localPage + 1) * localSize);
   const totalPages = Math.max(1, Math.ceil(items.length / localSize));
   return { content: content as ProductResponse[], totalElements: items.length, totalPages, size: localSize, number: localPage, first: localPage === 0, last: localPage >= totalPages - 1, numberOfElements: content.length, empty: content.length === 0 };
+  }
   // API GET /products: gửi page, size, categoryId, price, search, sort; nhận content + totalElements.
   const page = params?.page ?? 0;
   const size = params?.size ?? 12;
@@ -447,6 +449,16 @@ function mapCartRow(row: CartRow): CartItemResponse {
 }
 
 export async function getCart(): Promise<CartResponse> {
+  if (typeof window !== "undefined") {
+    const lines = JSON.parse(window.localStorage.getItem("northline-fashion-cart") ?? "[]") as { variantId: number; quantity: number }[];
+    const items = lines.flatMap(({ variantId, quantity }) => {
+      const product = fashionProducts.find((p) => p.variants.some((v) => v.id === variantId));
+      const variant = product?.variants.find((v) => v.id === variantId);
+      if (!product || !variant) return [];
+      return [{ id: variantId, variantId, productId: product.id, productSlug: product.slug, productName: product.name, imageKey: product.imageKey, sku: variant.sku, size: variant.size, color: variant.color, stock: variant.stock, unitPrice: variant.price, quantity, subtotal: variant.price * quantity }];
+    });
+    return { id: 1, items, totalAmount: items.reduce((sum, item) => sum + item.subtotal, 0) };
+  }
   // API GET /cart: trả các dòng hàng theo phiên người dùng, kèm giá/tồn kho mới nhất.
   const userId = await getSessionUserId();
   if (!userId) return { id: 0, items: [], totalAmount: 0 };
@@ -460,6 +472,14 @@ export async function getCart(): Promise<CartResponse> {
 }
 
 export async function addCartItem(variantId: number, quantity = 1) {
+  if (typeof window !== "undefined" && fashionProducts.some((p) => p.variants.some((v) => v.id === variantId))) {
+    const lines = JSON.parse(window.localStorage.getItem("northline-fashion-cart") ?? "[]") as { variantId: number; quantity: number }[];
+    const existing = lines.find((line) => line.variantId === variantId);
+    if (existing) existing.quantity += quantity;
+    else lines.push({ variantId, quantity });
+    window.localStorage.setItem("northline-fashion-cart", JSON.stringify(lines));
+    return getCart();
+  }
   // API POST /cart/items: variantId + quantity; server phải kiểm tra stock/giá thực.
   const userId = await requireUserId();
   const { data: existing } = await supabase
@@ -483,12 +503,22 @@ export async function addCartItem(variantId: number, quantity = 1) {
 }
 
 export async function updateCartItem(itemId: number, quantity: number) {
+  if (typeof window !== "undefined") {
+    const lines = JSON.parse(window.localStorage.getItem("northline-fashion-cart") ?? "[]") as { variantId: number; quantity: number }[];
+    window.localStorage.setItem("northline-fashion-cart", JSON.stringify(lines.map((line) => line.variantId === itemId ? { ...line, quantity } : line)));
+    return getCart();
+  }
   const { error } = await supabase.from("cart_items").update({ quantity }).eq("id", itemId);
   if (error) fail(error.message);
   return getCart();
 }
 
 export async function deleteCartItem(itemId: number) {
+  if (typeof window !== "undefined") {
+    const lines = JSON.parse(window.localStorage.getItem("northline-fashion-cart") ?? "[]") as { variantId: number; quantity: number }[];
+    window.localStorage.setItem("northline-fashion-cart", JSON.stringify(lines.filter((line) => line.variantId !== itemId)));
+    return;
+  }
   const { error } = await supabase.from("cart_items").delete().eq("id", itemId);
   if (error) fail(error.message);
 }
@@ -553,6 +583,15 @@ export async function createOrder(body: {
   paymentMethod?: string;
   shippingFee?: number;
 }) {
+  if (typeof window !== "undefined") {
+    const cart = await getCart();
+    if (cart.items.length === 0) fail("Your cart is empty.");
+    const orders = JSON.parse(window.localStorage.getItem("northline-fashion-orders") ?? "[]") as OrderResponse[];
+    const id = Date.now();
+    orders.unshift({ id, status: "pending", totalAmount: cart.totalAmount + (body.shippingFee ?? 0), shippingRecipientName: body.shippingRecipientName, shippingPhone: body.shippingPhone, shippingAddressLine: body.shippingAddressLine, shippingCity: body.shippingCity, paymentMethod: "cod", createdAt: new Date().toISOString(), items: cart.items.map((item) => ({ id: item.id, productNameSnapshot: item.productName, skuSnapshot: item.sku, sizeSnapshot: item.size, colorSnapshot: item.color, imageKeySnapshot: item.imageKey, unitPriceSnapshot: item.unitPrice, quantity: item.quantity, subtotal: item.subtotal })) });
+    window.localStorage.setItem("northline-fashion-orders", JSON.stringify(orders));
+    return { id };
+  }
   // API POST /checkout: thực tế cần một giao dịch server duy nhất để kiểm tồn kho,
   // tính lại tiền/thuế/vận chuyển, tạo order + items và xóa cart nguyên tử.
   // API POST /payments/session + webhook xác thực chữ ký để xác nhận thanh toán;
@@ -606,6 +645,12 @@ export async function createOrder(body: {
 }
 
 export async function getOrders(params?: { page?: number; size?: number }) {
+  if (typeof window !== "undefined") {
+    const orders = JSON.parse(window.localStorage.getItem("northline-fashion-orders") ?? "[]") as OrderResponse[];
+    const page = params?.page ?? 0, size = params?.size ?? 20, totalPages = Math.max(1, Math.ceil(orders.length / size));
+    const content = orders.slice(page * size, (page + 1) * size);
+    return { content, totalElements: orders.length, totalPages, size, number: page, first: page === 0, last: page >= totalPages - 1, numberOfElements: content.length, empty: content.length === 0 };
+  }
   // API GET /orders?page,size: server lọc theo user hoặc kiểm tra quyền admin.
   const page = params?.page ?? 0;
   const size = params?.size ?? 20;
@@ -632,6 +677,7 @@ export async function getOrders(params?: { page?: number; size?: number }) {
 }
 
 export async function getOrderById(id: number) {
+  if (typeof window !== "undefined") return (JSON.parse(window.localStorage.getItem("northline-fashion-orders") ?? "[]") as OrderResponse[]).find((order) => order.id === id);
   const { data, error } = await supabase
     .from("orders")
     .select(ORDER_SELECT)
@@ -642,6 +688,11 @@ export async function getOrderById(id: number) {
 }
 
 export async function cancelOrder(id: number) {
+  if (typeof window !== "undefined") {
+    const orders = JSON.parse(window.localStorage.getItem("northline-fashion-orders") ?? "[]") as OrderResponse[];
+    window.localStorage.setItem("northline-fashion-orders", JSON.stringify(orders.map((order) => order.id === id && order.status === "pending" ? { ...order, status: "cancelled" } : order)));
+    return;
+  }
   const { error } = await supabase.from("orders").update({ status: "cancelled" }).eq("id", id);
   if (error) fail(error.message);
 }
