@@ -339,32 +339,7 @@ export async function getProductsPage(params?: {
   const totalPages = Math.max(1, Math.ceil(items.length / localSize));
   return { content: content as ProductResponse[], totalElements: items.length, totalPages, size: localSize, number: localPage, first: localPage === 0, last: localPage >= totalPages - 1, numberOfElements: content.length, empty: content.length === 0 };
   }
-  // API GET /products: gửi page, size, categoryId, price, search, sort; nhận content + totalElements.
-  const page = params?.page ?? 0;
-  const size = params?.size ?? 12;
-  let query = supabase.from("products").select(PRODUCT_SELECT, { count: "exact" });
-  if (params?.categoryId !== undefined) query = query.eq("category_id", params.categoryId);
-  if (params?.minPrice !== undefined) query = query.gte("base_price", params.minPrice);
-  if (params?.maxPrice !== undefined) query = query.lte("base_price", params.maxPrice);
-  if (params?.search) query = query.ilike("name", `%${params.search}%`);
-  const column = params?.sortBy === "basePrice" ? "base_price" : "created_at";
-  query = query.order(column, { ascending: params?.sortDirection !== "desc" });
-  const { data, error, count } = await query.range(page * size, page * size + size - 1);
-  if (error) fail(error.message);
-  const total = count ?? 0;
-  const content = ((data ?? []) as unknown as ProductRow[]).map(mapProduct);
-  const totalPages = Math.max(1, Math.ceil(total / size));
-  return {
-    content,
-    totalElements: total,
-    totalPages,
-    size,
-    number: page,
-    first: page === 0,
-    last: page >= totalPages - 1,
-    numberOfElements: content.length,
-    empty: content.length === 0,
-  };
+  // API GET /products: thay khối local ở trên bằng truy vấn thật (page, size, categoryId, price, search, sort → content + totalElements).
 }
 
 export async function getProducts(params?: Parameters<typeof getProductsPage>[0]) {
@@ -397,15 +372,8 @@ export async function getProductBySlugRaw(slug: string) {
 }
 
 export async function getCategories(): Promise<CategoryResponse[]> {
+  // API GET /categories: thay bằng truy vấn danh mục thật khi backend sẵn sàng.
   return fashionCategories;
-  const { data, error } = await supabase.from("categories").select("*").order("id");
-  if (error) fail(error.message);
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
-    parentId: row.parent_id,
-  }));
 }
 
 /* ---------------------------------- Cart ---------------------------------- */
