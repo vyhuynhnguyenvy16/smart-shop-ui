@@ -83,14 +83,29 @@ export async function removeFromCart(itemId: string | number) {
   }
 }
 
+/** The backend empties the cart when an order is created; just resync. */
 export async function clearCart() {
-  await Promise.all(lines.map((line) => deleteCartItem(line.itemId)));
   lines = [];
-  loaded = true;
   emit();
+  try {
+    applyCart(await getCart());
+  } catch {
+    /* keep empty */
+  }
+}
+
+export async function reloadCart() {
+  loaded = false;
+  try {
+    applyCart(await getCart());
+  } catch {
+    lines = [];
+    emit();
+  }
 }
 
 function productFromCart(item: CartItemResponse): Product {
+  const image = item.imageUrl ?? imageForKey(undefined);
   return {
     id: item.productId,
     name: item.productName,
@@ -101,7 +116,8 @@ function productFromCart(item: CartItemResponse): Product {
     compareAt: null,
     rating: 0,
     reviews: 0,
-    image: imageForKey(item.imageKey),
+    image,
+    images: [image],
     category: "",
     categoryId: 0,
     stock: item.stock === 0 ? "out" : item.stock < 15 ? "low" : "in",
