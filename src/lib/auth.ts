@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import { getTokens, logoutUser, onAuthChange } from "./api-client";
+
+export type SessionUser = { signedIn: true };
 
 export function useAuthSession() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let active = true;
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!active) return;
-      setUser(session?.user ?? null);
+    const sync = () => {
+      setUser(getTokens()?.accessToken ? { signedIn: true } : null);
       setLoading(false);
-    });
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+    };
+    sync();
+    const off = onAuthChange(sync);
+    window.addEventListener("storage", sync);
     return () => {
-      active = false;
-      sub.subscription.unsubscribe();
+      off();
+      window.removeEventListener("storage", sync);
     };
   }, []);
 
@@ -44,5 +41,5 @@ export function useRequireAuth() {
 }
 
 export async function signOut() {
-  await supabase.auth.signOut();
+  await logoutUser();
 }
