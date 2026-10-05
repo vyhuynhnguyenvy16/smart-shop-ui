@@ -35,6 +35,7 @@ export type Product = {
   rating: number;
   reviews: number;
   image: string;
+  images: string[];
   category: string;
   categoryId: number;
   stock: "in" | "low" | "out";
@@ -67,14 +68,16 @@ export function adaptProduct(product: ProductResponse): Product {
   return {
     id: product.id,
     name: product.name,
-    slug: product.slug,
+    // Backend has no slug lookup, so product URLs use the numeric id.
+    slug: String(product.id),
     description: product.description,
     title: product.name,
     price: product.basePrice,
     compareAt: product.compareAtPrice,
     rating: product.rating,
     reviews: product.reviewsCount,
-    image: imageForKey(product.imageKey),
+    image: product.imageUrl ?? imageForKey(undefined),
+    images: product.images.length ? product.images : [product.imageUrl ?? imageForKey(undefined)],
     category: product.categoryName,
     categoryId: product.categoryId,
     stock: totalStock === 0 ? "out" : totalStock < 15 ? "low" : "in",
