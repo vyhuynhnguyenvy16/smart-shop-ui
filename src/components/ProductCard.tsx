@@ -3,7 +3,7 @@ import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/Rating";
 import { StockBadge } from "@/components/StockBadge";
-import { formatPrice, type Product } from "@/lib/products";
+import { fallbackImageFor, formatPrice, type Product } from "@/lib/products";
 import { addToCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -26,6 +26,7 @@ export function ProductCard({
         <Link to="/products/$slug" params={{ slug: product.slug }} aria-label={product.title}>
           <img
             src={product.image}
+            data-fallback={fallbackImageFor(product.category, product.id)}
             alt={product.title}
             width={1024}
             height={1024}

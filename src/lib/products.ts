@@ -46,7 +46,14 @@ export type Product = {
   createdAt: string;
 };
 
-export const CATEGORIES = ["Clothing", "Outerwear", "Denim", "Dresses", "Shoes", "Bags", "Accessories"] as const;
+export const CATEGORIES = ["Áo Quần", "Áo Khoác", "Quần Jean", "Váy Đầm", "Giày Dép", "Túi Xách", "Phụ Kiện"] as const;
+
+/** Ảnh dự phòng theo danh mục khi link ảnh từ backend bị lỗi (404). */
+export function fallbackImageFor(category: string | undefined, seed = 0) {
+  const c = (category ?? "").toLowerCase();
+  const group = /khoác|jacket|coat/.test(c) ? "outerwear" : /giày|dép|shoe/.test(c) ? "shoes" : /túi|phụ|bag|acc/.test(c) ? "accessories" : "apparel";
+  return productImages[`${group}-${(Math.abs(seed) % 4) + 1}`] ?? apparel1;
+}
 
 // API ẢNH SẢN PHẨM: image_key hiện là khóa ảnh minh họa dùng chung theo danh mục.
 // Khi nối catalog thật, GET /products và GET /products/:slug cần trả imageUrl và
@@ -117,7 +124,7 @@ export async function getProductCategories(): Promise<CategoryResponse[]> {
 }
 
 export const formatPrice = (value: number) =>
-  value.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  value.toLocaleString("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 });
 
-export const FREE_SHIPPING_THRESHOLD = 50;
-export const SHIPPING_FEE = 6;
+export const FREE_SHIPPING_THRESHOLD = 500000;
+export const SHIPPING_FEE = 30000;

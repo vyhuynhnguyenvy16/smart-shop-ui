@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="mt-12 border-t border-border bg-card">
       <div className="container-shop grid gap-6 py-12 sm:grid-cols-3">
         <div className="flex items-center gap-3 text-sm font-semibold text-foreground">
-          <Truck className="h-5 w-5 text-success" /> Free Shipping Over $50
+          <Truck className="h-5 w-5 text-success" /> Miễn phí vận chuyển từ 500.000₫
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold text-foreground">
           <RotateCcw className="h-5 w-5 text-success" /> 30-Day Free Returns

@@ -169,7 +169,7 @@ function ProductDetail() {
 
           <ul className="mt-6 grid gap-3 rounded-xl bg-card p-4 text-sm text-foreground">
             <li className="flex items-center gap-3">
-              <Truck className="h-5 w-5 text-success" /> Free Shipping Over $50
+              <Truck className="h-5 w-5 text-success" /> Miễn phí vận chuyển từ 500.000₫
             </li>
             <li className="flex items-center gap-3">
               <RotateCcw className="h-5 w-5 text-success" /> 30-Day Free Returns
