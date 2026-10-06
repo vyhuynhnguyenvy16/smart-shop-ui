@@ -336,7 +336,7 @@ function CheckoutPage() {
               <ShieldCheck className="h-4 w-4 text-success" /> SSL secure payment
             </li>
             <li className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-success" /> Free shipping over $50
+              <Truck className="h-4 w-4 text-success" /> Miễn phí vận chuyển từ 500.000₫
             </li>
           </ul>
         </aside>

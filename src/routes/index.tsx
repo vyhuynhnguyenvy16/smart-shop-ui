@@ -31,13 +31,10 @@ export const Route = createFileRoute("/")({
 });
 
 const categoryImages: Record<string, string> = {
-  Clothing: hero,
-  Outerwear: watch,
-  Denim: hero,
-  Dresses: hero,
-  Shoes: sneakers,
-  Bags: backpack,
-  Accessories: backpack,
+  "Áo Quần": hero,
+  "Áo Khoác": watch,
+  "Giày Dép": sneakers,
+  "Túi Xách": backpack,
 };
 
 function Home() {
@@ -68,7 +65,7 @@ function Home() {
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-primary-foreground">
               <li className="flex items-center gap-2">
-                <Truck className="h-4 w-4 text-success" /> Free shipping over $50
+                <Truck className="h-4 w-4 text-success" /> Miễn phí vận chuyển từ 500.000₫
               </li>
               <li className="flex items-center gap-2">
                 <RotateCcw className="h-4 w-4 text-success" /> 30-day returns
@@ -84,7 +81,7 @@ function Home() {
       <section className="container-shop section-y">
         <h2 className="text-2xl font-semibold text-foreground">Shop by category</h2>
         <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-4">
-          {CATEGORIES.filter((c) => ["Clothing", "Outerwear", "Shoes", "Bags"].includes(c)).map((c) => (
+          {CATEGORIES.filter((c) => ["Áo Quần", "Áo Khoác", "Giày Dép", "Túi Xách"].includes(c)).map((c) => (
             <Link
               key={c}
               to="/products"

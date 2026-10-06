@@ -39,7 +39,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background">
       <p className="bg-success py-2 text-center text-sm font-semibold text-success-foreground">
-        Free Shipping Over $50 · 30-Day Free Returns
+        Miễn phí vận chuyển từ 500.000₫ · 30-Day Free Returns
       </p>
 
       <div className="container-shop flex h-16 items-center gap-4">
