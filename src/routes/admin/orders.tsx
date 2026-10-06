@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminNav } from "@/components/AdminNav";
 import {
-  getOrderPage,
+  adaptOrder,
   ORDER_STATUSES,
   STATUS_LABEL,
   StatusBadgeClass,
@@ -10,6 +10,7 @@ import {
   type OrderStatus,
 } from "@/lib/orders";
 import { formatPrice } from "@/lib/products";
+import { getAdminOrders, getApiErrorMessage, updateAdminOrderStatus } from "@/lib/api-client";
 
 export const Route = createFileRoute("/admin/orders")({
   head: () => ({
@@ -36,18 +37,25 @@ function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<OrderStatus | "all">("all");
 
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    // API QUẢN TRỊ GET /admin/orders?page,size,status: server xác thực admin;
-    // getOrderPage hiện chỉ đọc đơn của tài khoản đang đăng nhập.
-    void getOrderPage().then((page) => setOrders(page.content));
+    void getAdminOrders({ page: 0, size: 100 })
+      .then((page) => setOrders(page.content.map(adaptOrder)))
+      .catch((e) => setError(getApiErrorMessage(e, "Unable to load orders (admin account required).")));
   }, []);
 
   const rows = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
-  // API QUẢN TRỊ PATCH /admin/orders/:id/status: kiểm tra quyền và chuyển trạng thái
-  // hợp lệ ở server; hiện dropdown chỉ thay state cục bộ, không lưu vào database.
-  const update = (id: string, status: OrderStatus) =>
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+  const update = async (id: string, status: OrderStatus) => {
+    setError("");
+    try {
+      await updateAdminOrderStatus(Number(String(id).replace(/\D/g, "")), status);
+      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    } catch (e) {
+      setError(getApiErrorMessage(e, "This status change is not allowed."));
+    }
+  };
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
