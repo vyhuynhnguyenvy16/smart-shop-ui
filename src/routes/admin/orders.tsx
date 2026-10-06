@@ -79,6 +79,7 @@ function AdminOrders() {
         </label>
       </div>
 
+      {error && <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">{error}</p>}
       <div className="mt-6 overflow-x-auto rounded-xl bg-card">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-border text-muted-foreground">
