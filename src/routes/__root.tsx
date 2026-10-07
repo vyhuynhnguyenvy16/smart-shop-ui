@@ -16,6 +16,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { BottomNav } from "../components/BottomNav";
 import { fallbackImageFor } from "../lib/products";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -142,6 +143,7 @@ function RootComponent() {
       </main>
       <Footer />
       <BottomNav />
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }
