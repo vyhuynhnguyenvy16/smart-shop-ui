@@ -45,7 +45,10 @@ function ProductDetail() {
   const variant = findVariant(currentProduct, color, size);
   const fallback = fallbackImageFor(currentProduct.category, currentProduct.id);
   const add = async (goCheckout = false) => {
-    if (!variant) return toast.error("Vui lòng chọn màu và size còn hàng.");
+    if (!variant) {
+      toast.error("Vui lòng chọn màu và size còn hàng.");
+      return;
+    }
     try {
       await addToCart(variant.id);
       toast.success("Đã thêm vào giỏ hàng");

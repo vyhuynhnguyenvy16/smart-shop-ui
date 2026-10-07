@@ -126,9 +126,9 @@ function RootComponent() {
   useEffect(() => {
     const onError = (e: Event) => {
       const img = e.target;
-      if (!(img instanceof HTMLImageElement) || img.dataset.fallbackUsed) return;
-      img.dataset.fallbackUsed = "1";
-      img.src = img.dataset.fallback || fallbackImageFor(undefined);
+      if (!(img instanceof HTMLImageElement) || img.dataset["fallbackUsed"]) return;
+      img.dataset["fallbackUsed"] = "1";
+      img.src = img.dataset["fallback"] || fallbackImageFor(undefined);
     };
     window.addEventListener("error", onError, true);
     return () => window.removeEventListener("error", onError, true);
