@@ -46,7 +46,7 @@ const PAGE_SIZE = 6;
 
 function ProductListing() {
   const { q, category } = Route.useSearch();
-  const [maxPrice, setMaxPrice] = useState(300);
+  const [maxPrice, setMaxPrice] = useState(5000000);
   const [minRating, setMinRating] = useState(0);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [cats, setCats] = useState<string[]>(category ? [category] : []);
@@ -133,9 +133,9 @@ function ProductListing() {
         </legend>
         <input
           type="range"
-          min={50}
-          max={300}
-          step={10}
+          min={100000}
+          max={5000000}
+          step={100000}
           value={maxPrice}
           onChange={(e) => setMaxPrice(Number(e.target.value))}
           className="h-11 w-full accent-[var(--primary)]"

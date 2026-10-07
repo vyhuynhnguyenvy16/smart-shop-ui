@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/Rating";
 import { StockBadge } from "@/components/StockBadge";
 import { ProductCard } from "@/components/ProductCard";
-import { formatPrice, getProductBySlug, getProducts } from "@/lib/products";
+import { fallbackImageFor, findVariant, formatPrice, getProductBySlug, getProducts } from "@/lib/products";
+import { toast } from "sonner";
 import { addToCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
 
@@ -36,20 +37,27 @@ export const Route = createFileRoute("/products/$slug")({
 function ProductDetail() {
   const product = Route.useLoaderData();
   const [active, setActive] = useState(0);
-  const [color, setColor] = useState("Black");
-  const [size, setSize] = useState("Standard");
   const navigate = useNavigate();
   const { related } = product;
   const currentProduct = product.product;
+  const [color, setColor] = useState(currentProduct.colors[0] ?? "");
+  const [size, setSize] = useState(currentProduct.sizes[0] ?? "");
+  const variant = findVariant(currentProduct, color, size);
+  const fallback = fallbackImageFor(currentProduct.category, currentProduct.id);
+  const add = async (goCheckout = false) => {
+    if (!variant) return toast.error("Vui lòng chọn màu và size còn hàng.");
+    try {
+      await addToCart(variant.id);
+      toast.success("Đã thêm vào giỏ hàng");
+      if (goCheckout) navigate({ to: "/checkout" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Không thêm được vào giỏ.");
+    }
+  };
   // API GALLERY: GET /products/:slug cần trả images[] của đúng sản phẩm,
   // có ảnh từng màu/size nếu khác nhau. Hiện chỉ lặp ảnh danh mục minh họa.
-  const gallery = [
-    currentProduct.image,
-    currentProduct.image,
-    currentProduct.image,
-    currentProduct.image,
-  ];
-  const out = currentProduct.stock === "out";
+  const gallery = currentProduct.images.length ? currentProduct.images : [currentProduct.image];
+  const out = currentProduct.stock === "out" || (variant ? variant.stock <= 0 : false);
 
   return (
     <div className="pb-24 md:pb-0">
@@ -63,7 +71,9 @@ function ProductDetail() {
       <div className="container-shop grid gap-8 py-8 md:grid-cols-2">
         <div>
           <img
+            key={gallery[active]}
             src={gallery[active]}
+            data-fallback={fallback}
             alt={currentProduct.title}
             width={1024}
             height={1024}
@@ -83,6 +93,7 @@ function ProductDetail() {
               >
                 <img
                   src={g}
+                  data-fallback={fallback}
                   alt=""
                   width={80}
                   height={80}
@@ -111,6 +122,11 @@ function ProductDetail() {
             )}
           </div>
           <StockBadge stock={currentProduct.stock} className="mt-3" />
+          {variant && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Mẫu đã chọn: {formatPrice(variant.price)} · còn {variant.stock} sản phẩm
+            </p>
+          )}
 
           <p className="mt-6 text-base text-muted-foreground">{currentProduct.description}</p>
 
@@ -122,10 +138,9 @@ function ProductDetail() {
                 onChange={(e) => setColor(e.target.value)}
                 className="mt-2 h-12 w-full rounded-lg border border-input bg-background px-3 text-base font-normal outline-none focus:border-primary"
               >
-                <option>Black</option>
-                <option>White</option>
-                <option>Olive</option>
-                <option>Silver</option>
+                {currentProduct.colors.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
               </select>
             </label>
             <label className="text-sm font-semibold text-foreground">
@@ -135,10 +150,9 @@ function ProductDetail() {
                 onChange={(e) => setSize(e.target.value)}
                 className="mt-2 h-12 w-full rounded-lg border border-input bg-background px-3 text-base font-normal outline-none focus:border-primary"
               >
-                <option>Standard</option>
-                <option>Small</option>
-                <option>Medium</option>
-                <option>Large</option>
+                {currentProduct.sizes.map((z) => (
+                  <option key={z}>{z}</option>
+                ))}
               </select>
             </label>
           </div>
@@ -149,7 +163,7 @@ function ProductDetail() {
               size="md"
               className="flex-1"
               disabled={out}
-              onClick={() => void addToCart(currentProduct.id)}
+              onClick={() => void add()}
             >
               <ShoppingCart /> {out ? "Out of Stock" : "Add to Cart"}
             </Button>
@@ -158,10 +172,7 @@ function ProductDetail() {
               size="md"
               className="flex-1"
               disabled={out}
-              onClick={() => {
-                void addToCart(currentProduct.id);
-                navigate({ to: "/checkout" });
-              }}
+              onClick={() => void add(true)}
             >
               Mua ngay
             </Button>
@@ -224,7 +235,7 @@ function ProductDetail() {
             size="md"
             className="flex-1"
             disabled={out}
-            onClick={() => void addToCart(currentProduct.id)}
+            onClick={() => void add()}
           >
             <ShoppingCart /> Add
           </Button>
@@ -233,10 +244,7 @@ function ProductDetail() {
             size="md"
             className="flex-1"
             disabled={out}
-            onClick={() => {
-              void addToCart(currentProduct.id);
-              navigate({ to: "/checkout" });
-            }}
+            onClick={() => void add(true)}
           >
             Mua ngay · {formatPrice(currentProduct.price)}
           </Button>
