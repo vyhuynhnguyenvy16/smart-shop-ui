@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { BottomNav } from "../components/BottomNav";
+import { fallbackImageFor } from "../lib/products";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -120,6 +122,18 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Ảnh từ backend bị lỗi (404) → tự đổi sang ảnh dự phòng theo danh mục.
+  useEffect(() => {
+    const onError = (e: Event) => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement) || img.dataset["fallbackUsed"]) return;
+      img.dataset["fallbackUsed"] = "1";
+      img.src = img.dataset["fallback"] || fallbackImageFor(undefined);
+    };
+    window.addEventListener("error", onError, true);
+    return () => window.removeEventListener("error", onError, true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Header />
@@ -129,6 +143,7 @@ function RootComponent() {
       </main>
       <Footer />
       <BottomNav />
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }
