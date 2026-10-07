@@ -1,24 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 import { AdminNav } from "@/components/AdminNav";
 import { Button } from "@/components/ui/button";
-import { CATEGORIES, formatPrice, getProducts } from "@/lib/products";
+import { fallbackImageFor, formatPrice, getProductCategories, getProducts, type Product } from "@/lib/products";
+import {
+  createAdminProduct,
+  deleteAdminProduct,
+  getApiErrorMessage,
+  updateAdminProduct,
+  type CategoryResponse,
+} from "@/lib/api-client";
 
 export const Route = createFileRoute("/admin/products")({
   head: () => ({
     meta: [
-      { title: "Product management — Northline Admin" },
-      {
-        name: "description",
-        content:
-          "Create, edit and delete Northline products, including variants and per-variant stock levels.",
-      },
-      { property: "og:title", content: "Product management — Northline Admin" },
-      {
-        property: "og:description",
-        content: "CRUD products with variants and inventory tracking.",
-      },
+      { title: "Quản lý sản phẩm — Northline Admin" },
+      { name: "description", content: "Thêm, sửa, xóa sản phẩm Northline và xem tồn kho từng biến thể." },
+      { property: "og:title", content: "Quản lý sản phẩm — Northline Admin" },
+      { property: "og:description", content: "Quản lý sản phẩm và tồn kho Northline." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -26,119 +27,146 @@ export const Route = createFileRoute("/admin/products")({
   component: AdminProducts,
 });
 
-type Variant = { name: string; stock: number };
-type Row = {
-  id: string;
-  title: string;
-  category: string;
-  price: number;
-  image: string;
-  variants: Variant[];
-};
+const slugify = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/gi, "d")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const inputCls =
+  "h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary";
 
 function AdminProducts() {
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rows, setRows] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Row | null>(null);
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [name, setName] = useState("");
+  const [categoryId, setCategoryId] = useState<number>(0);
   const [price, setPrice] = useState("");
-  const [variants, setVariants] = useState<Variant[]>([{ name: "", stock: 0 }]);
+  const [description, setDescription] = useState("");
+  const [imageUrls, setImageUrls] = useState("");
   const [error, setError] = useState("");
-  const defaultImage = rows[0]?.image ?? "";
 
-  useEffect(() => {
-    // API QUẢN TRỊ GET /admin/products: trả danh sách + variants(stock,sku,giá) thực;
-    // endpoint phải xác thực quyền admin ở server, không dựa vào giao diện này.
-    void getProducts({ page: 0, size: 100 }).then((items) => {
-      setRows(
-        items.map((p) => ({
-          id: String(p.id),
-          title: p.title,
-          category: p.category,
-          price: p.price,
-          image: p.image,
-          variants: [{ name: "Variant data unavailable", stock: p.stock === "out" ? 0 : 0 }],
-        })),
-      );
-    });
+  const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      const [items, cats] = await Promise.all([getProducts({ page: 0, size: 100 }), getProductCategories()]);
+      setRows(items);
+      setCategories(cats);
+    } catch (e) {
+      setLoadError(getApiErrorMessage(e));
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  function openNew() {
-    setEditing(null);
-    setTitle("");
-    setCategory(CATEGORIES[0]);
-    setPrice("");
-    setVariants([{ name: "", stock: 0 }]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  function openForm(p: Product | null) {
+    setEditing(p);
+    setName(p?.title ?? "");
+    setCategoryId(p?.categoryId ?? categories[0]?.id ?? 0);
+    setPrice(p ? String(p.price) : "");
+    setDescription(p?.description ?? "");
+    setImageUrls(p ? p.images.join("\n") : "");
     setError("");
     setOpen(true);
   }
 
-  function openEdit(row: Row) {
-    setEditing(row);
-    setTitle(row.title);
-    setCategory(row.category);
-    setPrice(String(row.price));
-    setVariants(row.variants.length ? row.variants : [{ name: "", stock: 0 }]);
-    setError("");
-    setOpen(true);
-  }
-
-  function save() {
-    // API QUẢN TRỊ POST /admin/products hoặc PATCH /admin/products/:id:
-    // lưu tên, danh mục, giá, ảnh upload/URL và variants(id,sku,color,size,stock).
-    // Hiện chỉ cập nhật state trên trang; tải lại sẽ mất thay đổi.
-    if (!title.trim()) return setError("Product name is required.");
-    if (!price.trim() || Number.isNaN(Number(price))) return setError("Enter a valid price.");
-    const cleaned = variants.filter((v) => v.name.trim());
-    if (cleaned.length === 0) return setError("Add at least one variant.");
-
-    const next: Row = {
-      id: editing?.id ?? `p-${Date.now()}`,
-      title: title.trim(),
-      category,
-      price: Number(price),
-      image: editing?.image ?? defaultImage,
-      variants: cleaned,
+  async function save() {
+    const priceNum = Number(price);
+    if (!name.trim()) return setError("Vui lòng nhập tên sản phẩm.");
+    if (!categoryId) return setError("Vui lòng chọn danh mục.");
+    if (!price.trim() || Number.isNaN(priceNum) || priceNum <= 0) return setError("Giá không hợp lệ.");
+    const urls = imageUrls.split(/\s+/).filter((u) => /^https?:\/\//.test(u));
+    const body = {
+      categoryId,
+      name: name.trim(),
+      slug: editing?.name === name.trim() && editing ? slugify(editing.name) : slugify(name),
+      description: description.trim(),
+      basePrice: priceNum,
+      imageUrls: urls,
     };
-    setRows((prev) =>
-      editing ? prev.map((r) => (r.id === editing.id ? next : r)) : [next, ...prev],
-    );
-    setOpen(false);
+    setSaving(true);
+    try {
+      if (editing) await updateAdminProduct(editing.id, body);
+      else await createAdminProduct(body);
+      toast.success(editing ? "Đã lưu thay đổi" : "Đã tạo sản phẩm");
+      setOpen(false);
+      await load();
+    } catch (e) {
+      setError(getApiErrorMessage(e));
+    } finally {
+      setSaving(false);
+    }
   }
 
-  const totalStock = (r: Row) => r.variants.reduce((s, v) => s + v.stock, 0);
+  async function remove(p: Product) {
+    if (!window.confirm(`Xóa "${p.title}"?`)) return;
+    try {
+      await deleteAdminProduct(p.id);
+      setRows((prev) => prev.filter((x) => x.id !== p.id));
+      toast.success("Đã xóa sản phẩm");
+    } catch (e) {
+      toast.error(getApiErrorMessage(e));
+    }
+  }
+
+  const totalStock = (p: Product) => p.variants.reduce((s, v) => s + v.stock, 0);
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
       <AdminNav />
       <div className="flex flex-wrap items-center gap-4">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Products</h1>
-        <Button variant="primary" size="md" className="ml-auto" onClick={openNew}>
-          <Plus /> New product
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Sản phẩm</h1>
+        <Button variant="primary" size="md" className="ml-auto" onClick={() => openForm(null)}>
+          <Plus /> Thêm sản phẩm
         </Button>
       </div>
+
+      {loadError && <p className="mt-4 text-sm font-semibold text-destructive">{loadError}</p>}
 
       <div className="mt-6 overflow-x-auto rounded-xl bg-card">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-border text-muted-foreground">
             <tr>
-              <th className="px-4 py-3 font-semibold">Product</th>
-              <th className="px-4 py-3 font-semibold">Category</th>
-              <th className="px-4 py-3 font-semibold">Price</th>
-              <th className="px-4 py-3 font-semibold">Variants</th>
-              <th className="px-4 py-3 font-semibold">Inventory</th>
-              <th className="px-4 py-3 font-semibold">Actions</th>
+              <th className="px-4 py-3 font-semibold">Sản phẩm</th>
+              <th className="px-4 py-3 font-semibold">Danh mục</th>
+              <th className="px-4 py-3 font-semibold">Giá</th>
+              <th className="px-4 py-3 font-semibold">Biến thể</th>
+              <th className="px-4 py-3 font-semibold">Tồn kho</th>
+              <th className="px-4 py-3 font-semibold">Thao tác</th>
             </tr>
           </thead>
           <tbody>
+            {loading && (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Đang tải...</td>
+              </tr>
+            )}
+            {!loading && rows.length === 0 && !loadError && (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Chưa có sản phẩm.</td>
+              </tr>
+            )}
             {rows.map((r) => (
               <tr key={r.id} className="border-b border-border last:border-0">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={r.image}
+                      data-fallback={fallbackImageFor(r.category, r.id)}
                       alt=""
                       width={40}
                       height={40}
@@ -150,7 +178,7 @@ function AdminProducts() {
                 <td className="px-4 py-3 text-muted-foreground">{r.category}</td>
                 <td className="px-4 py-3 font-semibold text-foreground">{formatPrice(r.price)}</td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  {r.variants.map((v) => v.name).join(", ")}
+                  {r.variants.length ? r.variants.map((v) => `${v.color}/${v.size} (${v.stock})`).join(", ") : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <span
@@ -162,22 +190,16 @@ function AdminProducts() {
                           : "font-semibold text-success"
                     }
                   >
-                    {totalStock(r)} in stock
+                    {totalStock(r)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
-                    <Button variant="secondary" size="sm" onClick={() => openEdit(r)}>
-                      <Pencil /> Edit
+                    <Button variant="secondary" size="sm" onClick={() => openForm(r)}>
+                      <Pencil /> Sửa
                     </Button>
-                    {/* API QUẢN TRỊ DELETE /admin/products/:id: xác thực admin,
-                        kiểm tra đơn liên quan trước khi xóa; hiện chỉ xóa khỏi state. */}
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setRows((prev) => prev.filter((x) => x.id !== r.id))}
-                    >
-                      <Trash2 /> Delete
+                    <Button variant="destructive" size="sm" onClick={() => void remove(r)}>
+                      <Trash2 /> Xóa
                     </Button>
                   </div>
                 </td>
@@ -192,17 +214,15 @@ function AdminProducts() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={editing ? "Edit product" : "New product"}
+            aria-label={editing ? "Sửa sản phẩm" : "Thêm sản phẩm"}
             className="my-8 w-full max-w-xl rounded-xl bg-background p-6 shadow-[var(--shadow-card-hover)]"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-foreground">
-                {editing ? "Edit product" : "New product"}
-              </h2>
+              <h2 className="text-xl font-bold text-foreground">{editing ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Close"
+                aria-label="Đóng"
                 className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground"
               >
                 <X className="h-5 w-5" />
@@ -210,124 +230,59 @@ function AdminProducts() {
             </div>
 
             {error && (
-              <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
-                {error}
-              </p>
+              <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">{error}</p>
             )}
 
             <div className="mt-4 grid gap-4">
-              <div>
-                <label
-                  htmlFor="p-title"
-                  className="mb-1 block text-sm font-semibold text-foreground"
-                >
-                  Product name
-                </label>
-                <input
-                  id="p-title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
-                />
-              </div>
-
+              <label className="text-sm font-semibold text-foreground">
+                Tên sản phẩm
+                <input value={name} onChange={(e) => setName(e.target.value)} className={`mt-1 ${inputCls}`} />
+              </label>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="p-cat"
-                    className="mb-1 block text-sm font-semibold text-foreground"
-                  >
-                    Category
-                  </label>
+                <label className="text-sm font-semibold text-foreground">
+                  Danh mục
                   <select
-                    id="p-cat"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(Number(e.target.value))}
+                    className={`mt-1 ${inputCls}`}
                   >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="p-price"
-                    className="mb-1 block text-sm font-semibold text-foreground"
-                  >
-                    Price (USD)
-                  </label>
-                  <input
-                    id="p-price"
-                    inputMode="decimal"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    className="h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
-                  />
-                </div>
+                </label>
+                <label className="text-sm font-semibold text-foreground">
+                  Giá (₫)
+                  <input inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={`mt-1 ${inputCls}`} />
+                </label>
               </div>
-
-              <fieldset>
-                <legend className="mb-2 text-sm font-semibold text-foreground">
-                  Variants & inventory
-                </legend>
-                <div className="grid gap-3">
-                  {variants.map((v, i) => (
-                    <div key={i} className="flex gap-3">
-                      <input
-                        value={v.name}
-                        placeholder="e.g. Black / M"
-                        aria-label={`Variant ${i + 1} name`}
-                        onChange={(e) =>
-                          setVariants((prev) =>
-                            prev.map((x, xi) => (xi === i ? { ...x, name: e.target.value } : x)),
-                          )
-                        }
-                        className="h-12 flex-1 rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
-                      />
-                      <input
-                        type="number"
-                        min={0}
-                        value={v.stock}
-                        aria-label={`Variant ${i + 1} stock`}
-                        onChange={(e) =>
-                          setVariants((prev) =>
-                            prev.map((x, xi) =>
-                              xi === i ? { ...x, stock: Number(e.target.value) } : x,
-                            ),
-                          )
-                        }
-                        className="h-12 w-28 rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
-                      />
-                      <button
-                        type="button"
-                        aria-label={`Remove variant ${i + 1}`}
-                        onClick={() => setVariants((prev) => prev.filter((_, xi) => xi !== i))}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="mt-3"
-                  onClick={() => setVariants((prev) => [...prev, { name: "", stock: 0 }])}
-                >
-                  <Plus /> Add variant
-                </Button>
-              </fieldset>
-
+              <label className="text-sm font-semibold text-foreground">
+                Mô tả
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-4 py-3 text-base font-normal outline-none focus:border-primary"
+                />
+              </label>
+              <label className="text-sm font-semibold text-foreground">
+                Link ảnh (mỗi dòng một link https://)
+                <textarea
+                  value={imageUrls}
+                  onChange={(e) => setImageUrls(e.target.value)}
+                  rows={3}
+                  className="mt-1 w-full rounded-lg border border-input bg-background px-4 py-3 text-base font-normal outline-none focus:border-primary"
+                />
+              </label>
+              {editing && editing.variants.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Biến thể (màu/size/tồn kho) hiện chỉ xem được — máy chủ chưa có chức năng sửa biến thể.
+                </p>
+              )}
               <div className="mt-2 flex gap-3">
-                <Button variant="secondary" size="md" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="primary" size="md" className="flex-1" onClick={save}>
-                  {editing ? "Save changes" : "Create product"}
+                <Button variant="secondary" size="md" onClick={() => setOpen(false)}>Hủy</Button>
+                <Button variant="primary" size="md" className="flex-1" disabled={saving} onClick={() => void save()}>
+                  {saving ? "Đang lưu..." : editing ? "Lưu thay đổi" : "Tạo sản phẩm"}
                 </Button>
               </div>
             </div>
