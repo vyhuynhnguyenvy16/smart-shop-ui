@@ -9,7 +9,8 @@ import backpack from "@/assets/fashion-accessories-1.webp";
 import watch from "@/assets/fashion-outerwear-1.webp";
 
 export const Route = createFileRoute("/")({
-  loader: () => getProducts({ page: 0, size: 8 }),
+  // Backend offline must not blank the home page; show an empty grid instead.
+  loader: () => getProducts({ page: 0, size: 8 }).catch(() => []),
   head: () => ({
     meta: [
       { title: "Northline — Modern Fashion & Everyday Style" },
