@@ -1,0 +1,8 @@
+{
+  // Pin the Worker name so Nitro's cloudflare-module preset doesn't
+  // auto-generate "<owner>-<repo>" and clash with the Worker that already
+  // exists in Cloudflare (named "smart-shop-ui"). Everything else (main,
+  // assets, compatibility flags, etc.) is still generated at build time
+  // into .output/server/wrangler.json.
+  "name": "smart-shop-ui",
+}
