@@ -88,30 +88,32 @@ function ProductDetail() {
             height={1024}
             className="aspect-square w-full bg-muted object-cover"
           />
-          <div className="mt-4 flex gap-3 overflow-x-auto">
-            {gallery.map((g, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActive(i)}
-                aria-label={`View image ${i + 1}`}
-                className={cn(
-                  "h-20 w-20 shrink-0 overflow-hidden border-2",
-                  i === active ? "border-foreground" : "border-border",
-                )}
-              >
-                <img
-                  src={g}
-                  data-fallback={fallback}
-                  alt=""
-                  width={80}
-                  height={80}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+          {gallery.length > 1 && (
+            <div className="mt-4 flex gap-3 overflow-x-auto">
+              {gallery.map((g, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActive(i)}
+                  aria-label={`View image ${i + 1}`}
+                  className={cn(
+                    "h-20 w-20 shrink-0 overflow-hidden border-2",
+                    i === active ? "border-foreground" : "border-border",
+                  )}
+                >
+                  <img
+                    src={g}
+                    data-fallback={fallback}
+                    alt=""
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -137,7 +139,9 @@ function ProductDetail() {
             </p>
           )}
 
-          <p className="mt-6 text-base text-muted-foreground">{currentProduct.description}</p>
+          <p className="measure mt-6 text-base text-muted-foreground">
+            {currentProduct.description}
+          </p>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-semibold text-foreground">

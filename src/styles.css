@@ -102,8 +102,10 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    /* Body copy sized and spaced per Butterick's Practical Typography:
+       15–25px point size (16px base here) and 120–145% line spacing. */
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
   ::selection {
@@ -147,4 +149,10 @@
 
 @utility hairline-b {
   border-bottom: 1px solid var(--color-border);
+}
+
+/* Cap long-form copy (descriptions, reviews) to ~70 characters per line —
+   Butterick's Practical Typography puts comfortable line length at 45–90ch. */
+@utility measure {
+  max-width: 70ch;
 }
