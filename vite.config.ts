@@ -12,4 +12,19 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Pin the generated wrangler.json's Worker name and give it an (empty)
+  // `previews` block, directly through Nitro's own config — rather than
+  // relying on Nitro finding a root wrangler.jsonc file, which it was not
+  // doing on Cloudflare Workers Builds' runner (it kept auto-generating
+  // "<owner>-<repo>" there even with that file present). This path is
+  // merged in unconditionally by @lovable.dev/vite-tanstack-config, so it
+  // works the same locally and in CI.
+  nitro: {
+    cloudflare: {
+      wrangler: {
+        name: "smart-shop-ui",
+        previews: {},
+      },
+    },
+  },
 } as any);
