@@ -37,65 +37,69 @@ export function Header() {
   }, [query]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
-      <p className="bg-success py-2 text-center text-sm font-semibold text-success-foreground">
-        Miễn phí vận chuyển từ 500.000₫ · 30-Day Free Returns
+    <header className="sticky top-0 z-40 bg-background hairline-b">
+      <p className="bg-foreground py-2 text-center text-sm text-background">
+        Miễn phí vận chuyển từ 500.000₫ &nbsp;·&nbsp; 30-day free returns
       </p>
 
-      <div className="container-shop flex h-16 items-center gap-4">
+      <div className="container-shop flex h-20 items-center gap-4">
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground md:hidden"
+          className="flex h-11 w-11 items-center justify-center text-foreground md:hidden"
           onClick={() => setOpen((o) => !o)}
           aria-label="Open menu"
         >
           {open ? <Menu className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
 
-        <Link to="/" className="text-xl font-bold tracking-tight text-foreground">
+        <Link
+          to="/"
+          className="font-display text-2xl tracking-tight text-foreground"
+          style={{ fontWeight: 500 }}
+        >
           Northline
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-5 lg:flex" aria-label="Main">
+        <nav className="ml-8 hidden items-center gap-6 lg:flex" aria-label="Main">
           {CATEGORIES.map((c) => (
             <Link
               key={c}
               to="/products"
               search={{ category: c }}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="border-b border-transparent pb-1 text-sm text-muted-foreground hover:border-foreground hover:text-foreground"
             >
               {c}
             </Link>
           ))}
         </nav>
 
-        <div className="relative ml-auto hidden min-w-[300px] flex-1 max-w-md sm:block">
+        <div className="relative ml-auto hidden min-w-[280px] flex-1 max-w-sm sm:block">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               navigate({ to: "/products", search: { q: query } });
             }}
           >
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products"
+              placeholder="Search"
               aria-label="Search products"
               autoComplete="off"
-              className="h-12 w-full rounded-lg border border-input bg-card pl-11 pr-4 text-base outline-none focus:border-primary"
+              className="h-11 w-full border-b border-input bg-transparent pl-6 pr-2 text-base outline-none placeholder:text-muted-foreground focus:border-foreground"
             />
           </form>
           {suggestions.length > 0 && (
-            <ul className="absolute inset-x-0 top-14 overflow-hidden rounded-lg border border-border bg-background shadow-[var(--shadow-card-hover)]">
+            <ul className="absolute inset-x-0 top-12 overflow-hidden border border-border bg-background">
               {suggestions.map((s) => (
                 <li key={s.id}>
                   <Link
                     to="/products/$slug"
                     params={{ slug: s.slug }}
                     onClick={() => setQuery("")}
-                    className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-card"
+                    className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted"
                   >
                     <img
                       src={s.image}
@@ -103,7 +107,7 @@ export function Header() {
                       width={40}
                       height={40}
                       loading="lazy"
-                      className="h-10 w-10 rounded-md object-cover"
+                      className="h-10 w-10 object-cover"
                     />
                     <span className="line-clamp-2-title">{s.title}</span>
                   </Link>
@@ -116,11 +120,11 @@ export function Header() {
         <Link
           to="/cart"
           aria-label={`Cart, ${count} items`}
-          className="relative ml-auto flex h-11 w-11 items-center justify-center rounded-lg text-foreground sm:ml-0"
+          className="relative ml-auto flex h-11 w-11 items-center justify-center text-foreground sm:ml-0"
         >
           <ShoppingCart className="h-6 w-6" />
           {count > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-sm font-bold text-primary-foreground">
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center bg-primary px-1 text-[0.6875rem] font-semibold leading-none text-primary-foreground">
               {count}
             </span>
           )}
@@ -128,23 +132,25 @@ export function Header() {
         <Link
           to="/auth"
           aria-label="Account"
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground hover:bg-card"
+          className="flex h-11 w-11 items-center justify-center text-foreground hover:text-muted-foreground"
         >
           <User className="h-6 w-6" />
         </Link>
         <Link
           to="/admin/orders"
           aria-label="Admin"
-          className="hidden h-11 w-11 items-center justify-center rounded-lg text-foreground hover:bg-card sm:flex"
+          className="hidden h-11 w-11 items-center justify-center text-foreground hover:text-muted-foreground sm:flex"
         >
           <Shield className="h-5 w-5" />
         </Link>
       </div>
 
       {open && (
-        <div className="border-t border-border md:hidden">
+        <div className="hairline-t md:hidden">
           <div className="container-shop flex items-center justify-between py-3">
-            <span className="text-sm font-semibold">Categories</span>
+            <span className="font-display text-base" style={{ fontWeight: 500 }}>
+              Categories
+            </span>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -161,7 +167,7 @@ export function Header() {
                 to="/products"
                 search={{ category: c }}
                 onClick={() => setOpen(false)}
-                className="flex min-h-11 items-center rounded-lg px-2 text-base font-medium text-foreground hover:bg-card"
+                className="flex min-h-11 items-center px-2 text-base text-foreground hover:bg-muted"
               >
                 {c}
               </Link>

@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/Rating";
 import { StockBadge } from "@/components/StockBadge";
 import { ProductCard } from "@/components/ProductCard";
-import { fallbackImageFor, findVariant, formatPrice, getProductBySlug, getProducts } from "@/lib/products";
+import {
+  fallbackImageFor,
+  findVariant,
+  formatPrice,
+  getProductBySlug,
+  getProducts,
+} from "@/lib/products";
 import { toast } from "sonner";
 import { addToCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
@@ -26,8 +32,8 @@ export const Route = createFileRoute("/products/$slug")({
           { name: "description", content: loaderData.product.description },
           { property: "og:title", content: loaderData.product.title },
           { property: "og:description", content: loaderData.product.description },
-           { property: "og:type", content: "product" },
-           { name: "twitter:card", content: "summary_large_image" },
+          { property: "og:type", content: "product" },
+          { name: "twitter:card", content: "summary_large_image" },
         ]
       : [],
   }),
@@ -80,7 +86,7 @@ function ProductDetail() {
             alt={currentProduct.title}
             width={1024}
             height={1024}
-            className="aspect-square w-full rounded-xl object-cover shadow-[var(--shadow-card)] transition-transform duration-300 hover:scale-105"
+            className="aspect-square w-full bg-muted object-cover"
           />
           <div className="mt-4 flex gap-3 overflow-x-auto">
             {gallery.map((g, i) => (
@@ -90,8 +96,8 @@ function ProductDetail() {
                 onClick={() => setActive(i)}
                 aria-label={`View image ${i + 1}`}
                 className={cn(
-                  "h-20 w-20 shrink-0 overflow-hidden rounded-lg border-2",
-                  i === active ? "border-primary" : "border-border",
+                  "h-20 w-20 shrink-0 overflow-hidden border-2",
+                  i === active ? "border-foreground" : "border-border",
                 )}
               >
                 <img
@@ -109,13 +115,13 @@ function ProductDetail() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold leading-snug text-foreground md:text-3xl">
+          <h1 className="font-display text-2xl leading-snug text-foreground md:text-3xl">
             {currentProduct.title}
           </h1>
           <Rating value={currentProduct.rating} count={currentProduct.reviews} className="mt-3" />
 
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-primary">
+            <span className="text-3xl font-semibold text-foreground">
               {formatPrice(currentProduct.price)}
             </span>
             {currentProduct.compareAt && (
@@ -181,7 +187,7 @@ function ProductDetail() {
             </Button>
           </div>
 
-          <ul className="mt-6 grid gap-3 rounded-xl bg-card p-4 text-sm text-foreground">
+          <ul className="mt-6 grid gap-3 hairline bg-card p-4 text-sm text-foreground">
             <li className="flex items-center gap-3">
               <Truck className="h-5 w-5 text-success" /> Miễn phí vận chuyển từ 500.000₫
             </li>
@@ -204,7 +210,7 @@ function ProductDetail() {
       </div>
 
       <section className="container-shop section-y pt-0">
-        <h2 className="text-2xl font-semibold text-foreground">Customer reviews</h2>
+        <h2 className="font-display text-2xl text-foreground">Customer reviews</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {/* API ĐÁNH GIÁ: GET /products/:slug/reviews?page=... trả sao, nội dung,
               người mua đã xác minh và tổng số đánh giá; dữ liệu dưới đây là minh họa. */}
@@ -213,17 +219,17 @@ function ProductDetail() {
             { n: "David L.", t: "Great build quality for the price. Would buy again." },
             { n: "Sara K.", t: "Returns were painless when I sized wrong the first time." },
           ].map((r) => (
-            <blockquote key={r.n} className="rounded-xl bg-card p-4">
+            <blockquote key={r.n} className="hairline-t pt-4">
               <Rating value={5} count={1} className="mb-2" />
               <p className="text-base text-foreground">{r.t}</p>
-              <footer className="mt-2 text-sm text-success">{r.n} · Verified Buyer</footer>
+              <footer className="mt-2 text-sm text-muted-foreground">{r.n} · Verified buyer</footer>
             </blockquote>
           ))}
         </div>
       </section>
 
       <section className="container-shop section-y pt-0">
-        <h2 className="text-2xl font-semibold text-foreground">You may also like</h2>
+        <h2 className="font-display text-2xl text-foreground">You may also like</h2>
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {related.map((p) => (
             <ProductCard key={p.id} product={p} />

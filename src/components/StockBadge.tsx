@@ -3,15 +3,14 @@ import { cn } from "@/lib/utils";
 
 export function StockBadge({ stock, className }: { stock: Product["stock"]; className?: string }) {
   const map = {
-    in: { label: "In Stock", cls: "bg-success/10 text-success" },
-    low: { label: "Low Stock", cls: "bg-warning/10 text-warning" },
-    out: { label: "Out of Stock", cls: "bg-destructive/10 text-destructive" },
+    in: { label: "In stock", cls: "text-success" },
+    low: { label: "Low stock", cls: "text-warning" },
+    out: { label: "Out of stock", cls: "text-destructive" },
   } as const;
   const { label, cls } = map[stock];
   return (
-    <span
-      className={cn("inline-flex items-center rounded-md px-2 py-1 text-sm font-semibold", cls, className)}
-    >
+    <span className={cn("inline-flex items-center gap-1.5 text-sm", cls, className)}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
       {label}
     </span>
   );

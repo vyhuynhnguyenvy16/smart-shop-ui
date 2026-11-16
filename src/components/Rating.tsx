@@ -17,14 +17,14 @@ export function Rating({
           <Star
             key={i}
             className={cn(
-              "h-4 w-4",
-              i <= Math.round(value) ? "fill-warning text-warning" : "text-border",
+              "h-3.5 w-3.5",
+              i <= Math.round(value) ? "fill-foreground text-foreground" : "text-border",
             )}
           />
         ))}
       </span>
-      <span className="font-semibold text-foreground">{value.toFixed(1)}</span>
-      <span className="text-muted-foreground">({count.toLocaleString()} reviews)</span>
+      <span className="text-foreground">{value.toFixed(1)}</span>
+      <span className="text-muted-foreground">({count.toLocaleString()})</span>
     </div>
   );
 }

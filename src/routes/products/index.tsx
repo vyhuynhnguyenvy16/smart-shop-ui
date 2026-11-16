@@ -83,8 +83,8 @@ function ProductListing() {
         };
         const response = await getProductsPage(productParams);
         if (!active) return;
-        const filtered = response.content.filter((item) =>
-          (cats.length <= 1 || cats.includes(item.category)) && item.rating >= minRating,
+        const filtered = response.content.filter(
+          (item) => (cats.length <= 1 || cats.includes(item.category)) && item.rating >= minRating,
         );
         setList(inStockOnly ? filtered.filter((item) => item.stock !== "out") : filtered);
         setTotal(response.totalElements);
@@ -178,7 +178,7 @@ function ProductListing() {
 
   return (
     <div className="container-shop section-y">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+      <h1 className="font-display text-3xl text-foreground">
         {q ? `Results for “${q}”` : cats.length === 1 ? cats[0] : "All products"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">{total} products</p>
@@ -201,7 +201,7 @@ function ProductListing() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as (typeof SORTS)[number])}
-                className="h-12 rounded-lg border border-input bg-card px-3 text-sm text-foreground"
+                className="h-11 border-b border-input bg-transparent px-2 text-sm text-foreground focus:border-foreground"
               >
                 {SORTS.map((s) => (
                   <option key={s}>{s}</option>
@@ -216,17 +216,13 @@ function ProductListing() {
             ))}
           </div>
           {loading && (
-            <p className="rounded-xl bg-card p-8 text-center text-base text-muted-foreground">
+            <p className="hairline p-8 text-center text-base text-muted-foreground">
               Loading products...
             </p>
           )}
-          {error && (
-            <p className="rounded-xl bg-destructive/10 p-8 text-center text-base text-destructive">
-              {error}
-            </p>
-          )}
+          {error && <p className="hairline p-8 text-center text-base text-destructive">{error}</p>}
           {!loading && !error && list.length === 0 && (
-            <p className="rounded-xl bg-card p-8 text-center text-base text-muted-foreground">
+            <p className="hairline p-8 text-center text-base text-muted-foreground">
               No products match these filters.
             </p>
           )}
@@ -294,7 +290,7 @@ function ProductListing() {
           onClick={() => setQuick(null)}
         >
           <div
-            className="grid w-full max-w-2xl gap-6 rounded-xl bg-background p-6 sm:grid-cols-2"
+            className="grid w-full max-w-2xl gap-6 bg-background p-6 sm:grid-cols-2"
             onClick={(e) => e.stopPropagation()}
           >
             <img
@@ -302,12 +298,14 @@ function ProductListing() {
               alt={quick.title}
               width={1024}
               height={1024}
-              className="aspect-square w-full rounded-lg object-cover"
+              className="aspect-square w-full object-cover"
             />
             <div>
-              <h2 className="text-2xl font-semibold leading-snug text-foreground">{quick.title}</h2>
+              <h2 className="font-display text-2xl leading-snug text-foreground">{quick.title}</h2>
               <Rating value={quick.rating} count={quick.reviews} className="mt-3" />
-              <p className="mt-3 text-xl font-bold text-primary">{formatPrice(quick.price)}</p>
+              <p className="mt-3 text-xl font-semibold text-foreground">
+                {formatPrice(quick.price)}
+              </p>
               <StockBadge stock={quick.stock} className="mt-3" />
               <p className="mt-4 text-base text-muted-foreground">{quick.description}</p>
               <Button

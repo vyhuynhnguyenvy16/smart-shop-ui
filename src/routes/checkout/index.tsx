@@ -47,7 +47,6 @@ const SHIPPING_OPTIONS = [
 function CheckoutPage() {
   useRequireAuth();
 
-
   const items = detailedCart(useCart());
   const { subtotal } = cartTotals(items);
   const [step, setStep] = useState(0);
@@ -91,11 +90,11 @@ function CheckoutPage() {
   if (done) {
     return (
       <div className="container-shop section-y pb-24 md:pb-12">
-        <div className="mx-auto max-w-lg rounded-xl bg-card p-8 text-center">
+        <div className="mx-auto max-w-lg hairline bg-card p-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10">
             <Check className="h-7 w-7 text-success" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-foreground">Order placed</h1>
+          <h1 className="font-display mt-4 text-2xl text-foreground">Order placed</h1>
           <p className="mt-2 text-base text-muted-foreground">
             We emailed your confirmation. Order status is Pending until we confirm it.
           </p>
@@ -129,15 +128,15 @@ function CheckoutPage() {
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">Checkout</h1>
+      <h1 className="font-display text-3xl text-foreground">Checkout</h1>
 
       <ol className="mt-6 flex flex-wrap items-center gap-4">
         {STEPS.map((s, i) => (
           <li key={s} className="flex items-center gap-2">
             <span
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
-                i <= step ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground",
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
+                i <= step ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
               )}
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
@@ -155,7 +154,7 @@ function CheckoutPage() {
       </ol>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="rounded-xl bg-card p-6">
+        <div className="hairline bg-card p-6">
           {step === 0 && (
             <form
               className="grid gap-4 sm:grid-cols-2"
@@ -291,8 +290,8 @@ function CheckoutPage() {
           )}
         </div>
 
-        <aside className="h-fit rounded-xl bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Order summary</h2>
+        <aside className="h-fit hairline bg-card p-6">
+          <h2 className="font-display text-lg text-foreground">Order summary</h2>
           <ul className="mt-4 grid gap-3">
             {items.map((i) => (
               <li key={i.product.id} className="flex items-center gap-3 text-sm">
@@ -301,7 +300,7 @@ function CheckoutPage() {
                   alt=""
                   width={48}
                   height={48}
-                  className="h-12 w-12 rounded-md object-cover"
+                  className="h-12 w-12 object-cover"
                 />
                 <span className="line-clamp-2-title flex-1 text-foreground">{i.product.title}</span>
                 <span className="text-muted-foreground">×{i.qty}</span>
@@ -311,7 +310,7 @@ function CheckoutPage() {
               <li className="text-sm text-muted-foreground">Cart is empty.</li>
             )}
           </ul>
-          <dl className="mt-6 grid gap-2 border-t border-border pt-4 text-sm">
+          <dl className="mt-6 grid gap-2 hairline-t pt-4 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Subtotal</dt>
               <dd className="font-semibold text-foreground">{formatPrice(subtotal)}</dd>
@@ -326,9 +325,9 @@ function CheckoutPage() {
               <dt className="text-muted-foreground">Tax (8%)</dt>
               <dd className="font-semibold text-foreground">{formatPrice(tax)}</dd>
             </div>
-            <div className="mt-2 flex justify-between border-t border-border pt-3 text-lg">
+            <div className="mt-2 flex justify-between hairline-t pt-3 text-lg">
               <dt className="font-semibold text-foreground">Total</dt>
-              <dd className="font-bold text-primary">{formatPrice(total)}</dd>
+              <dd className="font-semibold text-foreground">{formatPrice(total)}</dd>
             </div>
           </dl>
           <ul className="mt-6 grid gap-2 text-sm text-muted-foreground">

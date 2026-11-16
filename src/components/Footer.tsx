@@ -1,23 +1,20 @@
 import { Link } from "@tanstack/react-router";
-import { ShieldCheck, Truck, RotateCcw } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="mt-12 border-t border-border bg-card">
-      <div className="container-shop grid gap-6 py-12 sm:grid-cols-3">
-        <div className="flex items-center gap-3 text-sm font-semibold text-foreground">
-          <Truck className="h-5 w-5 text-success" /> Miễn phí vận chuyển từ 500.000₫
-        </div>
-        <div className="flex items-center gap-3 text-sm font-semibold text-foreground">
-          <RotateCcw className="h-5 w-5 text-success" /> 30-Day Free Returns
-        </div>
-        <div className="flex items-center gap-3 text-sm font-semibold text-foreground">
-          <ShieldCheck className="h-5 w-5 text-success" /> SSL Secure Checkout
-        </div>
+    <footer className="mt-16 hairline-t bg-background">
+      <div className="container-shop grid gap-x-8 gap-y-6 py-12 sm:grid-cols-3">
+        <p className="text-sm text-muted-foreground">
+          Miễn phí vận chuyển từ 500.000₫, giao trong 3–5 ngày.
+        </p>
+        <p className="text-sm text-muted-foreground">30 ngày đổi trả miễn phí, không cần lý do.</p>
+        <p className="text-sm text-muted-foreground">Thanh toán được bảo mật SSL toàn trình.</p>
       </div>
-      <div className="container-shop flex flex-wrap items-center justify-between gap-4 border-t border-border py-6 text-sm text-muted-foreground">
-        <span>© {new Date().getFullYear()} Northline</span>
-        <div className="flex gap-4">
+      <div className="container-shop flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-muted-foreground hairline-t">
+        <span className="font-display" style={{ fontWeight: 500 }}>
+          Northline
+        </span>
+        <div className="flex gap-6">
           <Link to="/products" search={{}} className="hover:text-foreground hover:underline">
             Shop
           </Link>
@@ -28,6 +25,7 @@ export function Footer() {
             Checkout
           </Link>
         </div>
+        <span>© {new Date().getFullYear()}</span>
       </div>
     </footer>
   );
