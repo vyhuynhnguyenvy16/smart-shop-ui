@@ -32,7 +32,6 @@ function CartPage() {
   useRequireAuth();
   const [error, setError] = useState("");
 
-
   const items = detailedCart(useCart());
   const { subtotal } = cartTotals(items);
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
@@ -41,9 +40,9 @@ function CartPage() {
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
       <div className="mb-8 flex items-center gap-3 text-sm text-muted-foreground">
-        <span className="font-semibold text-primary">Step 1 of 3</span> · Cart
+        <span className="text-foreground">Step 1 of 3</span> · Cart
       </div>
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">Your cart</h1>
+      <h1 className="font-display text-3xl text-foreground">Your cart</h1>
       {error && (
         <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
           {error}
@@ -51,7 +50,7 @@ function CartPage() {
       )}
 
       {items.length === 0 ? (
-        <div className="mt-8 rounded-xl bg-card p-8 text-center">
+        <div className="mt-8 hairline p-8 text-center">
           <p className="text-base text-muted-foreground">Your cart is empty.</p>
           <Button variant="primary" size="md" asChild className="mt-6">
             <Link to="/products" search={{}}>
@@ -63,24 +62,24 @@ function CartPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
           <div className="space-y-4">
             {items.map(({ product, qty, itemId }) => (
-              <div key={itemId} className="flex gap-4 rounded-xl bg-card p-4">
+              <div key={itemId} className="flex gap-4 hairline-b pb-4">
                 <img
                   src={product.image}
                   alt={product.title}
                   width={112}
                   height={112}
                   loading="lazy"
-                  className="h-28 w-28 shrink-0 rounded-lg object-cover"
+                  className="h-28 w-28 shrink-0 bg-muted object-cover"
                 />
                 <div className="flex-1">
                   <Link
                     to="/products/$slug"
                     params={{ slug: product.slug }}
-                    className="line-clamp-2-title text-base font-semibold text-foreground hover:text-primary"
+                    className="line-clamp-2-title font-display text-base leading-snug text-foreground hover:text-primary"
                   >
                     {product.title}
                   </Link>
-                  <p className="mt-1 text-xl font-bold text-primary">
+                  <p className="mt-1 text-base font-semibold text-foreground">
                     {formatPrice(product.price)}
                   </p>
                   <div className="mt-3 flex items-center gap-3">
@@ -128,29 +127,29 @@ function CartPage() {
             ))}
           </div>
 
-          <aside className="h-fit rounded-xl bg-card p-4 lg:sticky lg:top-32">
+          <aside className="h-fit hairline bg-card p-4 lg:sticky lg:top-32">
             <div className="mb-4">
               <p className="text-sm text-foreground">
                 {remaining > 0
                   ? `Spend ${formatPrice(remaining)} more for free shipping`
                   : "You've unlocked free shipping"}
               </p>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+              <div className="mt-2 h-1 w-full overflow-hidden bg-border">
                 <div
-                  className="h-full bg-success transition-all"
+                  className="h-full bg-foreground transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
 
-            <dl className="space-y-2 border-t border-border pt-4 text-sm">
+            <dl className="space-y-2 hairline-t pt-4 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Subtotal</dt>
                 <dd className="font-semibold text-foreground">{formatPrice(subtotal)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Shipping</dt>
-                <dd className="font-semibold text-success">
+                <dd className="font-semibold text-foreground">
                   {remaining > 0 ? formatPrice(5) : "Free"}
                 </dd>
               </div>
@@ -160,9 +159,9 @@ function CartPage() {
                   {formatPrice(Math.round(subtotal * 0.08))}
                 </dd>
               </div>
-              <div className="flex justify-between border-t border-border pt-3 text-base">
+              <div className="flex justify-between hairline-t pt-3 text-base">
                 <dt className="font-semibold text-foreground">Total</dt>
-                <dd className="text-xl font-bold text-primary">
+                <dd className="text-xl font-semibold text-foreground">
                   {formatPrice(subtotal + (remaining > 0 ? 5 : 0) + Math.round(subtotal * 0.08))}
                 </dd>
               </div>
