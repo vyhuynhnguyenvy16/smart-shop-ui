@@ -48,7 +48,7 @@ export function ProductCard({
 
   return (
     <article className="group relative flex flex-col">
-      <div className="relative overflow-hidden bg-muted">
+      <div className="relative overflow-hidden rounded-lg bg-muted">
         <Link to="/products/$slug" params={{ slug: product.slug }} tabIndex={-1} aria-hidden="true">
           <img
             src={displayImage(product.image, product.category, product.id)}
@@ -59,22 +59,22 @@ export function ProductCard({
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             className={cn(
-              "aspect-[3/4] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]",
+              "aspect-[3/4] w-full object-cover transition-transform duration-200 ease-standard group-hover:scale-[1.04]",
               out && "opacity-60",
             )}
           />
         </Link>
 
         {out ? (
-          <span className="absolute left-0 top-0 bg-background px-2 py-1 text-xs text-foreground">
+          <span className="absolute left-2.5 top-2.5 rounded-sm bg-card px-2 py-1 text-label-sm text-foreground">
             Hết hàng
           </span>
         ) : onSale ? (
-          <span className="absolute left-0 top-0 bg-primary px-2 py-1 text-xs text-primary-foreground">
+          <span className="absolute left-2.5 top-2.5 rounded-sm bg-sale px-2 py-1 text-label-sm text-white">
             Giảm giá
           </span>
         ) : product.badge ? (
-          <span className="absolute left-0 top-0 bg-foreground px-2 py-1 text-xs text-background">
+          <span className="absolute left-2.5 top-2.5 rounded-sm bg-card px-2 py-1 text-label-sm text-foreground">
             {product.badge}
           </span>
         ) : null}
@@ -88,22 +88,24 @@ export function ProductCard({
               : `Thêm “${product.title}” vào yêu thích`
           }
           aria-pressed={wished}
-          className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-foreground/70 transition-colors hover:text-primary"
+          className="absolute right-1 top-1 flex h-11 w-11 items-center justify-center"
         >
-          <Heart
-            className={cn("h-5 w-5", wished && "fill-primary text-primary")}
-            aria-hidden="true"
-          />
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-1 transition-[color,transform] duration-150 ease-standard hover:text-sale active:scale-90">
+            <Heart
+              className={cn("h-[18px] w-[18px]", wished && "fill-sale text-sale")}
+              aria-hidden="true"
+            />
+          </span>
         </button>
 
         {!out && (onQuickView || quickAddVariant) && (
-          <div className="absolute inset-x-0 bottom-0 hidden translate-y-full transition-transform duration-200 group-focus-within:translate-y-0 group-hover:translate-y-0 md:block">
+          <div className="absolute inset-x-2.5 bottom-2.5 hidden translate-y-[calc(100%+12px)] transition-transform duration-200 ease-enter group-focus-within:translate-y-0 group-hover:translate-y-0 md:block">
             {quickAddVariant ? (
               <button
                 type="button"
                 disabled={adding}
                 onClick={() => void quickAdd()}
-                className="flex h-11 w-full items-center justify-center bg-background/95 text-sm text-foreground hover:bg-foreground hover:text-background"
+                className="flex h-11 w-full items-center justify-center rounded-md bg-card/95 text-label text-foreground shadow-1 backdrop-blur transition-colors duration-150 hover:bg-primary hover:text-primary-foreground"
               >
                 {adding ? "Đang thêm…" : "Thêm vào giỏ"}
               </button>
@@ -111,7 +113,7 @@ export function ProductCard({
               <button
                 type="button"
                 onClick={() => onQuickView?.(product)}
-                className="flex h-11 w-full items-center justify-center bg-background/95 text-sm text-foreground hover:bg-foreground hover:text-background"
+                className="flex h-11 w-full items-center justify-center rounded-md bg-card/95 text-label text-foreground shadow-1 backdrop-blur transition-colors duration-150 hover:bg-primary hover:text-primary-foreground"
               >
                 Chọn nhanh size
               </button>
@@ -121,27 +123,22 @@ export function ProductCard({
       </div>
 
       <div className="mt-3 flex flex-col gap-1">
-        <h3 className="text-[0.9375rem] leading-snug text-foreground">
+        <h3 className="text-[0.9375rem] font-medium leading-[1.375rem] text-foreground">
           <Link
             to="/products/$slug"
             params={{ slug: product.slug }}
-            className="line-clamp-2-title hover:text-primary"
+            className="line-clamp-2-title transition-colors duration-150 hover:text-primary"
           >
             {product.title}
           </Link>
         </h3>
 
         <p className="flex items-baseline gap-2">
-          <span
-            className={cn(
-              "tabular text-[0.9375rem] font-semibold",
-              onSale ? "text-primary" : "text-foreground",
-            )}
-          >
+          <span className={cn("text-price", onSale ? "text-sale" : "text-foreground")}>
             {formatPrice(product.price)}
           </span>
           {onSale && product.compareAt !== null && (
-            <span className="tabular text-sm text-muted-foreground line-through">
+            <span className="tabular text-body-sm text-muted-foreground line-through">
               <span className="sr-only">Giá gốc </span>
               {formatPrice(product.compareAt)}
             </span>
@@ -149,9 +146,9 @@ export function ProductCard({
         </p>
 
         {product.colors.length > 1 && (
-          <p className="text-sm text-muted-foreground">{product.colors.length} màu</p>
+          <p className="text-body-sm text-muted-foreground">{product.colors.length} màu</p>
         )}
-        {product.stock === "low" && <p className="text-sm text-warning">Sắp hết hàng</p>}
+        {product.stock === "low" && <p className="text-body-sm text-warning">Sắp hết hàng</p>}
 
         <Rating value={product.rating} count={product.reviews} />
       </div>

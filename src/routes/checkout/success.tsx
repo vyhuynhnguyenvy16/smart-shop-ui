@@ -25,7 +25,7 @@ function SuccessPage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-success/10">
           <Check className="h-7 w-7 text-success" aria-hidden="true" />
         </div>
-        <h1 className="font-display mt-4 text-3xl text-foreground">Đặt hàng thành công</h1>
+        <h1 className="mt-4 text-h1 text-foreground">Đặt hàng thành công</h1>
         <p className="mt-2 text-base text-muted-foreground">
           {orderId ? (
             <>
@@ -36,7 +36,7 @@ function SuccessPage() {
           Đơn đang chờ shop xác nhận. Bạn sẽ thanh toán khi nhận hàng.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Button variant="primary" size="md" asChild className="h-12">
+          <Button variant="primary" size="lg" asChild>
             {orderId ? (
               <Link to="/orders/$id" params={{ id: String(orderId) }}>
                 Xem đơn hàng
@@ -45,7 +45,7 @@ function SuccessPage() {
               <Link to="/orders">Xem đơn hàng</Link>
             )}
           </Button>
-          <Button variant="secondary" size="md" asChild className="h-12">
+          <Button variant="secondary" size="lg" asChild>
             <Link to="/products" search={{}}>
               Tiếp tục mua sắm
             </Link>

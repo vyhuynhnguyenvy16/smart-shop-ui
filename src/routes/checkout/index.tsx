@@ -171,7 +171,7 @@ function CheckoutPage() {
 
   const field = (key: FieldKey, type = "text", className = "") => (
     <div className={className}>
-      <label htmlFor={key} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={key} className="mb-1.5 block text-body-sm font-medium text-foreground">
         {LABELS[key]}{" "}
         <span className="text-destructive" aria-hidden="true">
           *
@@ -192,12 +192,12 @@ function CheckoutPage() {
         aria-invalid={Boolean(errors[key])}
         aria-describedby={errors[key] ? `${key}-error` : undefined}
         className={cn(
-          "h-12 w-full border bg-background px-4 text-base outline-none transition-colors focus:border-foreground",
+          "h-12 w-full rounded-md border bg-card px-3.5 text-base outline-none transition-[border-color,box-shadow] duration-150 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_20%,transparent)]",
           errors[key] ? "border-destructive" : "border-input",
         )}
       />
       {errors[key] && (
-        <p id={`${key}-error`} className="mt-1.5 text-sm text-destructive">
+        <p id={`${key}-error`} className="mt-1.5 text-body-sm text-destructive">
           {errors[key]}
         </p>
       )}
@@ -205,9 +205,9 @@ function CheckoutPage() {
   );
 
   return (
-    <div className="container-shop pb-28 pt-6 md:pb-12">
+    <div className="container-shop pb-32 pt-6 md:pb-12">
       <ol
-        className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+        className="flex flex-wrap items-center gap-2 text-body-sm text-muted-foreground"
         aria-label="Các bước đặt hàng"
       >
         <li>
@@ -230,7 +230,7 @@ function CheckoutPage() {
           3. Xác nhận
         </li>
       </ol>
-      <h1 className="font-display mt-4 text-3xl text-foreground md:text-4xl">
+      <h1 className="mt-4 text-h1 text-foreground">
         {step === "address" ? "Thông tin giao hàng" : "Xác nhận đơn hàng"}
       </h1>
 
@@ -249,7 +249,7 @@ function CheckoutPage() {
                   ref={summaryRef}
                   tabIndex={-1}
                   role="alert"
-                  className="mb-6 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive outline-none"
+                  className="mb-6 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-body-sm text-destructive outline-none"
                 >
                   <p className="font-semibold">Cần sửa {errorKeys.length} thông tin:</p>
                   <ul className="mt-1 list-disc pl-5">
@@ -266,7 +266,7 @@ function CheckoutPage() {
 
               {saved.length > 0 && (
                 <fieldset className="mb-8">
-                  <legend className="mb-3 text-sm font-semibold text-foreground">
+                  <legend className="mb-3 text-body-sm font-semibold text-foreground">
                     Địa chỉ đã lưu
                   </legend>
                   <div className="grid gap-2">
@@ -276,10 +276,10 @@ function CheckoutPage() {
                         <label
                           key={id}
                           className={cn(
-                            "flex items-start gap-3 border p-4 text-sm",
+                            "flex items-start gap-3 rounded-md bg-card p-4 text-body-sm transition-[box-shadow,background-color] duration-150",
                             selectedSaved === id
-                              ? "border-foreground"
-                              : "border-border hover:border-foreground",
+                              ? "bg-accent shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
+                              : "shadow-[inset_0_0_0_1px_var(--color-border)] hover:shadow-[inset_0_0_0_1px_var(--color-foreground)]",
                           )}
                         >
                           <input
@@ -316,7 +316,7 @@ function CheckoutPage() {
                 {field("address", "text", "sm:col-span-2")}
                 {field("city", "text", "sm:col-span-2")}
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="mt-4 text-body-sm text-muted-foreground">
                 <span className="text-destructive" aria-hidden="true">
                   *
                 </span>{" "}
@@ -325,8 +325,8 @@ function CheckoutPage() {
               <Button
                 type="submit"
                 variant="primary"
-                size="md"
-                className="mt-6 h-12 w-full sm:w-auto sm:px-10"
+                size="lg"
+                className="mt-6 w-full sm:w-auto sm:px-10"
               >
                 Tiếp tục
               </Button>
@@ -335,13 +335,13 @@ function CheckoutPage() {
             <div className="grid gap-8">
               <section className="hairline p-5" aria-labelledby="ship-to">
                 <div className="flex items-start justify-between gap-4">
-                  <h2 id="ship-to" className="text-sm font-semibold text-foreground">
+                  <h2 id="ship-to" className="text-body-sm font-semibold text-foreground">
                     Giao tới
                   </h2>
                   <button
                     type="button"
                     onClick={() => setStep("address")}
-                    className="min-h-11 text-sm text-primary underline-offset-4 hover:underline"
+                    className="min-h-11 text-body-sm text-primary underline-offset-4 hover:underline"
                   >
                     Sửa
                   </button>
@@ -349,20 +349,20 @@ function CheckoutPage() {
                 <p className="text-base text-foreground">
                   {fields.fullName} · {fields.phone}
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-body-sm text-muted-foreground">
                   {fields.address}, {fields.city}
                 </p>
               </section>
 
               <section className="hairline p-5" aria-labelledby="pay-heading">
-                <h2 id="pay-heading" className="text-sm font-semibold text-foreground">
+                <h2 id="pay-heading" className="text-body-sm font-semibold text-foreground">
                   Thanh toán
                 </h2>
                 <p className="mt-2 flex items-center gap-3 text-base text-foreground">
                   <Wallet className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                   Thanh toán khi nhận hàng (COD)
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-body-sm text-muted-foreground">
                   Bạn trả tiền mặt cho nhân viên giao hàng khi nhận được đơn.
                 </p>
               </section>
@@ -370,7 +370,7 @@ function CheckoutPage() {
               {orderError && (
                 <p
                   role="alert"
-                  className="border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                  className="border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-body-sm text-destructive"
                 >
                   {orderError}{" "}
                   <Link to="/cart" className="underline underline-offset-2">
@@ -382,16 +382,16 @@ function CheckoutPage() {
               <div className="flex flex-col-reverse gap-3 sm:flex-row">
                 <Button
                   variant="secondary"
-                  size="md"
-                  className="h-12"
+                  size="lg"
+
                   onClick={() => setStep("address")}
                 >
                   Quay lại
                 </Button>
                 <Button
                   variant="primary"
-                  size="md"
-                  className="h-12 flex-1"
+                  size="lg"
+                  className="flex-1"
                   onClick={() => void placeOrder()}
                   disabled={placing || items.length === 0}
                 >
@@ -406,19 +406,19 @@ function CheckoutPage() {
           className="h-fit hairline bg-card p-6 lg:sticky lg:top-32"
           aria-labelledby="order-summary"
         >
-          <h2 id="order-summary" className="font-display text-xl text-foreground">
+          <h2 id="order-summary" className="text-h3 text-foreground">
             Đơn hàng <span className="tabular text-muted-foreground">({count})</span>
           </h2>
           <ul className="mt-4 grid gap-4">
             {items.map((i) => (
-              <li key={i.itemId} className="flex items-center gap-3 text-sm">
+              <li key={i.itemId} className="flex items-center gap-3 text-body-sm">
                 <span className="relative shrink-0">
                   <img
                     src={displayImage(i.product.image, i.product.category, i.product.id)}
                     alt=""
                     width={48}
                     height={64}
-                    className="aspect-[3/4] w-12 bg-muted object-cover"
+                    className="aspect-[3/4] w-12 rounded-sm bg-muted object-cover"
                   />
                   <span className="tabular absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1 text-[0.6875rem] text-background">
                     {i.qty}
@@ -436,7 +436,7 @@ function CheckoutPage() {
               </li>
             ))}
             {items.length === 0 && (
-              <li className="text-sm text-muted-foreground">
+              <li className="text-body-sm text-muted-foreground">
                 Giỏ hàng trống.{" "}
                 <Link
                   to="/products"
@@ -448,7 +448,7 @@ function CheckoutPage() {
               </li>
             )}
           </ul>
-          <dl className="tabular mt-6 grid gap-2 hairline-t pt-4 text-sm">
+          <dl className="tabular mt-6 grid gap-2 hairline-t pt-4 text-body-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Tạm tính</dt>
               <dd className="text-foreground">{formatPrice(subtotal)}</dd>
