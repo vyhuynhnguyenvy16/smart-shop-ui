@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRequireAuth } from "@/lib/auth";
 import { cancelOrder, getApiErrorMessage } from "@/lib/api-client";
-import { getOrderPage, STATUS_LABEL, StatusBadgeClass, type Order, type OrderStatus } from "@/lib/orders";
+import {
+  getOrderPage,
+  STATUS_LABEL,
+  StatusBadgeClass,
+  type Order,
+  type OrderStatus,
+} from "@/lib/orders";
 import { formatPrice } from "@/lib/products";
 
 export const Route = createFileRoute("/orders/")({
@@ -52,10 +58,10 @@ function OrderListPage() {
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">Đơn hàng của tôi</h1>
+      <h1 className="font-display text-3xl text-foreground md:text-4xl">Đơn hàng của tôi</h1>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
+        <p className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       )}
@@ -80,13 +86,13 @@ function OrderListPage() {
       </div>
 
       {shown.length === 0 ? (
-        <div className="mt-8 rounded-xl bg-card p-8 text-center text-muted-foreground">
+        <div className="mt-8 hairline bg-card p-8 text-center text-muted-foreground">
           Chưa có đơn hàng nào.
         </div>
       ) : (
         <div className="mt-6 grid gap-4">
           {shown.map((o) => (
-            <article key={o.id} className="rounded-xl bg-card p-5">
+            <article key={o.id} className="hairline bg-card p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-base font-semibold text-foreground">#ORD-{o.id}</span>
                 <span className="text-sm text-muted-foreground">
@@ -104,7 +110,9 @@ function OrderListPage() {
                 ))}
               </ul>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-lg font-bold text-primary">{formatPrice(o.total)}</span>
+                <span className="tabular text-lg font-semibold text-foreground">
+                  {formatPrice(o.total)}
+                </span>
                 <div className="flex gap-2">
                   <Button variant="secondary" size="sm" asChild>
                     <Link to="/orders/$id" params={{ id: o.id }}>

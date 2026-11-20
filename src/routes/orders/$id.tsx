@@ -3,7 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRequireAuth } from "@/lib/auth";
-import { cancelOrder, getApiErrorMessage, getOrderById, type OrderResponse } from "@/lib/api-client";
+import {
+  cancelOrder,
+  getApiErrorMessage,
+  getOrderById,
+  type OrderResponse,
+} from "@/lib/api-client";
 import { STATUS_LABEL, StatusBadgeClass, type OrderStatus } from "@/lib/orders";
 import { formatPrice } from "@/lib/products";
 
@@ -42,7 +47,7 @@ function OrderDetailPage() {
   if (!order) {
     return (
       <div className="container-shop section-y pb-24 md:pb-12">
-        <p className="rounded-xl bg-card p-8 text-center text-muted-foreground">
+        <p className="hairline bg-card p-8 text-center text-muted-foreground">
           {error || "Không tìm thấy đơn hàng."}
         </p>
       </div>
@@ -58,7 +63,7 @@ function OrderDetailPage() {
         ← Tất cả đơn hàng
       </Link>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">#ORD-{order.id}</h1>
+        <h1 className="font-display text-3xl text-foreground md:text-4xl">#ORD-{order.id}</h1>
         <span className={cn(StatusBadgeClass(status))}>{STATUS_LABEL[status]}</span>
       </div>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -66,14 +71,14 @@ function OrderDetailPage() {
       </p>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
+        <p className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="rounded-xl bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Sản phẩm</h2>
+        <div className="hairline bg-card p-6">
+          <h2 className="font-display text-xl text-foreground">Sản phẩm</h2>
           <ul className="mt-4 grid gap-3">
             {order.items.map((i) => (
               <li key={i.id} className="flex justify-between gap-4 text-sm">
@@ -90,8 +95,8 @@ function OrderDetailPage() {
           </ul>
         </div>
 
-        <aside className="h-fit rounded-xl bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Địa chỉ giao hàng</h2>
+        <aside className="h-fit hairline bg-card p-6">
+          <h2 className="font-display text-xl text-foreground">Địa chỉ giao hàng</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {order.shippingRecipientName}
             <br />
@@ -99,7 +104,7 @@ function OrderDetailPage() {
             <br />
             {order.shippingAddressLine}, {order.shippingCity}
           </p>
-          <h2 className="mt-6 text-lg font-semibold text-foreground">Thanh toán</h2>
+          <h2 className="font-display mt-6 text-xl text-foreground">Thanh toán</h2>
           <dl className="mt-2 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Tạm tính</dt>
@@ -111,7 +116,9 @@ function OrderDetailPage() {
             </div>
             <div className="flex justify-between border-t border-border pt-2">
               <dt className="font-semibold">Tổng</dt>
-              <dd className="text-xl font-bold text-primary">{formatPrice(order.totalAmount)}</dd>
+              <dd className="tabular text-xl font-semibold text-foreground">
+                {formatPrice(order.totalAmount)}
+              </dd>
             </div>
           </dl>
 

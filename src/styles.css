@@ -112,6 +112,53 @@
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);
   }
+
+  /* WCAG 2.2 focus-visible: one consistent, high-contrast ring for every
+     interactive element that doesn't draw its own. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  button:not(:disabled),
+  [role="button"],
+  label:has(input:not(:disabled)),
+  summary {
+    cursor: pointer;
+  }
+
+  /* Respect the OS "reduce motion" setting (UI UX Pro Max: reduced-motion). */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Prices and quantities: tabular figures so digits don't jitter as values change. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Loading placeholder that reserves the final layout (no layout shift). */
+@utility skeleton {
+  background-color: var(--color-muted);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 @utility container-shop {

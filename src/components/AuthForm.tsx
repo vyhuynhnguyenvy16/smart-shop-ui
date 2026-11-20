@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getApiErrorMessage, loginUser, registerUser } from "@/lib/api-client";
 
 const inputClass =
-  "h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary";
+  "h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground";
 
 export function AuthForm({ mode, redirect }: { mode: "login" | "register"; redirect?: string }) {
   const navigate = useNavigate();
@@ -62,8 +62,8 @@ export function AuthForm({ mode, redirect }: { mode: "login" | "register"; redir
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <div className="mx-auto w-full max-w-md rounded-xl bg-card p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-foreground">
+      <div className="mx-auto w-full max-w-md hairline bg-card p-6 sm:p-8">
+        <h1 className="font-display text-3xl text-foreground">
           {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -75,7 +75,7 @@ export function AuthForm({ mode, redirect }: { mode: "login" | "register"; redir
         {message && (
           <div
             role="alert"
-            className="mt-6 flex gap-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
+            className="mt-6 flex gap-3 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive"
           >
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
             <span>{message}</span>
