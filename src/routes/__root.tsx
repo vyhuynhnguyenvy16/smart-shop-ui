@@ -17,22 +17,30 @@ import { Footer } from "../components/Footer";
 import { BottomNav } from "../components/BottomNav";
 import { fallbackImageFor } from "../lib/products";
 import { Toaster } from "sonner";
+import { jsonLd, SITE_NAME, SITE_URL } from "../lib/seo";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="container-shop flex min-h-[60vh] items-center justify-center py-16">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+        <p className="tabular text-sm text-muted-foreground">Lỗi 404</p>
+        <h1 className="font-display mt-2 text-3xl text-foreground">Không tìm thấy trang</h1>
+        <p className="mt-3 text-base text-muted-foreground">
+          Trang bạn tìm không tồn tại hoặc đã được chuyển đi. Thử xem toàn bộ sản phẩm nhé.
         </p>
-        <div className="mt-6">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/products"
+            search={{}}
+            className="inline-flex h-11 items-center justify-center rounded-sm bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-foreground"
+          >
+            Xem sản phẩm
+          </Link>
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex h-11 items-center justify-center rounded-sm border border-foreground px-6 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-background"
           >
-            Go home
+            Về trang chủ
           </Link>
         </div>
       </div>
@@ -50,11 +58,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <h1 className="font-display text-2xl text-foreground">Trang chưa tải được</h1>
+        <p className="mt-2 text-base text-muted-foreground">
+          Đã có lỗi khi kết nối tới máy chủ. Bạn thử tải lại, hoặc quay về trang chủ.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -62,15 +68,15 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex h-11 items-center justify-center rounded-sm bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-foreground"
           >
-            Try again
+            Thử lại
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex h-11 items-center justify-center rounded-sm border border-foreground px-6 text-sm font-medium text-foreground transition-colors hover:bg-foreground hover:text-background"
           >
-            Go home
+            Về trang chủ
           </a>
         </div>
       </div>
@@ -83,12 +89,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Northline — Everyday Style" },
-      { name: "description", content: "Explore Northline's curated edit of everyday style and accessories." },
+      { name: "theme-color", content: "#f6f2ea" },
+      { title: "Northline — Thời trang tối giản, bền lâu" },
+      {
+        name: "description",
+        content: "Northline: quần áo, áo khoác, giày, túi và phụ kiện tối giản, mặc được lâu.",
+      },
       { name: "author", content: "Northline" },
-      { property: "og:title", content: "Northline — Everyday Style" },
-      { property: "og:description", content: "Curated everyday style and accessories at Northline." },
-      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Northline" },
+      { property: "og:locale", content: "vi_VN" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -97,6 +106,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      // The two weights used above the fold; the rest load on demand.
+      {
+        rel: "preload",
+        href: "/fonts/archivo-latin-400-normal.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        href: "/fonts/fraunces-latin-400-normal.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+    ],
+    scripts: [
+      jsonLd({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: SITE_URL,
+      }),
     ],
   }),
   shellComponent: RootShell,
@@ -107,7 +139,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <head>
         <HeadContent />
       </head>
@@ -136,14 +168,20 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-foreground focus:px-4 focus:py-3 focus:text-sm focus:text-background"
+      >
+        Bỏ qua tới nội dung chính
+      </a>
       <Header />
-      <main className="min-h-[60vh]">
+      <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </main>
       <Footer />
       <BottomNav />
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors closeButton duration={4000} />
     </QueryClientProvider>
   );
 }

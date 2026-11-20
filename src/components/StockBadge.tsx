@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 
 export function StockBadge({ stock, className }: { stock: Product["stock"]; className?: string }) {
   const map = {
-    in: { label: "In stock", cls: "text-success" },
-    low: { label: "Low stock", cls: "text-warning" },
-    out: { label: "Out of stock", cls: "text-destructive" },
+    in: { label: "Còn hàng", cls: "text-success" },
+    low: { label: "Sắp hết hàng", cls: "text-warning" },
+    out: { label: "Hết hàng", cls: "text-destructive" },
   } as const;
   const { label, cls } = map[stock];
   return (

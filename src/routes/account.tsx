@@ -75,18 +75,18 @@ function AccountPage() {
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+      <h1 className="font-display text-3xl text-foreground md:text-4xl">
         Xin chào, {profile.fullName || "bạn"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">{profile.email}</p>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
+        <p className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </p>
       )}
       {message && (
-        <p className="mt-4 rounded-lg bg-success/10 px-4 py-3 text-sm font-semibold text-success">
+        <p className="mt-4 border-l-2 border-success bg-success/10 px-4 py-3 text-sm text-success">
           {message}
         </p>
       )}
@@ -116,7 +116,7 @@ function AccountPage() {
             <p className="text-sm text-muted-foreground">Bạn chưa có đơn hàng nào.</p>
           )}
           {orders.map((o) => (
-            <article key={o.id} className="rounded-xl bg-card p-5">
+            <article key={o.id} className="hairline bg-card p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <Package className="h-5 w-5 text-muted-foreground" />
                 <span className="text-base font-semibold text-foreground">#{o.id}</span>
@@ -133,7 +133,9 @@ function AccountPage() {
                 ))}
               </ul>
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">{formatPrice(o.total)}</span>
+                <span className="tabular text-lg font-semibold text-foreground">
+                  {formatPrice(o.total)}
+                </span>
                 <Button variant="secondary" size="sm" asChild>
                   <Link to="/orders/$id" params={{ id: String(o.id) }}>
                     Xem chi tiết
@@ -146,10 +148,10 @@ function AccountPage() {
       )}
 
       {tab === "Hồ sơ" && (
-        <form onSubmit={saveProfile} className="mt-6 max-w-lg rounded-xl bg-card p-6">
+        <form onSubmit={saveProfile} className="mt-6 max-w-lg hairline bg-card p-6">
           <div className="flex items-center gap-3">
             <User className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">Thông tin cá nhân</h2>
+            <h2 className="font-display text-xl text-foreground">Thông tin cá nhân</h2>
           </div>
           <div className="mt-4 grid gap-4">
             <div>
@@ -160,7 +162,7 @@ function AccountPage() {
                 id="fullName"
                 value={profile.fullName}
                 onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-                className="h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
+                className="h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground"
               />
             </div>
             <div>
@@ -171,7 +173,7 @@ function AccountPage() {
                 id="email"
                 value={profile.email}
                 readOnly
-                className="h-12 w-full rounded-lg border border-input bg-muted px-4 text-base text-muted-foreground"
+                className="h-12 w-full border border-input bg-muted px-4 text-base text-muted-foreground"
               />
             </div>
             <div>
@@ -182,7 +184,7 @@ function AccountPage() {
                 id="phone"
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                className="h-12 w-full rounded-lg border border-input bg-background px-4 text-base outline-none focus:border-primary"
+                className="h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground"
               />
             </div>
             <Button type="submit" variant="primary" size="md" disabled={saving}>
@@ -193,10 +195,10 @@ function AccountPage() {
       )}
 
       {tab === "Địa chỉ" && (
-        <div className="mt-6 max-w-lg rounded-xl bg-card p-6">
+        <div className="mt-6 max-w-lg hairline bg-card p-6">
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">Địa chỉ giao hàng</h2>
+            <h2 className="font-display text-xl text-foreground">Địa chỉ giao hàng</h2>
           </div>
           {addresses.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
@@ -205,7 +207,7 @@ function AccountPage() {
           ) : (
             <ul className="mt-4 grid gap-4">
               {addresses.map((a) => (
-                <li key={a.id} className="rounded-lg border border-border p-4 text-base">
+                <li key={a.id} className="border border-border p-4 text-base">
                   <p className="font-semibold text-foreground">
                     {a.recipientName} · {a.phone}
                     {a.isDefault && (

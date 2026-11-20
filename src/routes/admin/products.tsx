@@ -3,8 +3,15 @@ import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminNav } from "@/components/AdminNav";
+import { CatalogImport } from "@/components/admin/CatalogImport";
 import { Button } from "@/components/ui/button";
-import { fallbackImageFor, formatPrice, getProductCategories, getProducts, type Product } from "@/lib/products";
+import {
+  fallbackImageFor,
+  formatPrice,
+  getProductCategories,
+  getProducts,
+  type Product,
+} from "@/lib/products";
 import {
   createAdminProduct,
   deleteAdminProduct,
@@ -17,7 +24,10 @@ export const Route = createFileRoute("/admin/products")({
   head: () => ({
     meta: [
       { title: "Quản lý sản phẩm — Northline Admin" },
-      { name: "description", content: "Thêm, sửa, xóa sản phẩm Northline và xem tồn kho từng biến thể." },
+      {
+        name: "description",
+        content: "Thêm, sửa, xóa sản phẩm Northline và xem tồn kho từng biến thể.",
+      },
       { property: "og:title", content: "Quản lý sản phẩm — Northline Admin" },
       { property: "og:description", content: "Quản lý sản phẩm và tồn kho Northline." },
       { property: "og:type", content: "website" },
@@ -47,6 +57,7 @@ function AdminProducts() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [saving, setSaving] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState<number>(0);
@@ -59,7 +70,10 @@ function AdminProducts() {
     setLoading(true);
     setLoadError("");
     try {
-      const [items, cats] = await Promise.all([getProducts({ page: 0, size: 100 }), getProductCategories()]);
+      const [items, cats] = await Promise.all([
+        getProducts({ page: 0, size: 100 }),
+        getProductCategories(),
+      ]);
       setRows(items);
       setCategories(cats);
     } catch (e) {
@@ -88,7 +102,8 @@ function AdminProducts() {
     const priceNum = Number(price);
     if (!name.trim()) return setError("Vui lòng nhập tên sản phẩm.");
     if (!categoryId) return setError("Vui lòng chọn danh mục.");
-    if (!price.trim() || Number.isNaN(priceNum) || priceNum <= 0) return setError("Giá không hợp lệ.");
+    if (!price.trim() || Number.isNaN(priceNum) || priceNum <= 0)
+      return setError("Giá không hợp lệ.");
     const urls = imageUrls.split(/\s+/).filter((u) => /^https?:\/\//.test(u));
     const body = {
       categoryId,
@@ -130,10 +145,27 @@ function AdminProducts() {
       <AdminNav />
       <div className="flex flex-wrap items-center gap-4">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Sản phẩm</h1>
-        <Button variant="primary" size="md" className="ml-auto" onClick={() => openForm(null)}>
+        <Button
+          variant="secondary"
+          size="md"
+          className="ml-auto"
+          disabled={loading || rows.length === 0}
+          onClick={() => setImportOpen(true)}
+        >
+          Áp dụng ảnh & mô tả tiếng Việt
+        </Button>
+        <Button variant="primary" size="md" onClick={() => openForm(null)}>
           <Plus /> Thêm sản phẩm
         </Button>
       </div>
+      {importOpen && (
+        <CatalogImport
+          rows={rows}
+          categories={categories}
+          onClose={() => setImportOpen(false)}
+          onDone={() => void load()}
+        />
+      )}
 
       {loadError && <p className="mt-4 text-sm font-semibold text-destructive">{loadError}</p>}
 
@@ -152,12 +184,16 @@ function AdminProducts() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Đang tải...</td>
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
+                  Đang tải...
+                </td>
               </tr>
             )}
             {!loading && rows.length === 0 && !loadError && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">Chưa có sản phẩm.</td>
+                <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
+                  Chưa có sản phẩm.
+                </td>
               </tr>
             )}
             {rows.map((r) => (
@@ -178,7 +214,9 @@ function AdminProducts() {
                 <td className="px-4 py-3 text-muted-foreground">{r.category}</td>
                 <td className="px-4 py-3 font-semibold text-foreground">{formatPrice(r.price)}</td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  {r.variants.length ? r.variants.map((v) => `${v.color}/${v.size} (${v.stock})`).join(", ") : "—"}
+                  {r.variants.length
+                    ? r.variants.map((v) => `${v.color}/${v.size} (${v.stock})`).join(", ")
+                    : "—"}
                 </td>
                 <td className="px-4 py-3">
                   <span
@@ -218,7 +256,9 @@ function AdminProducts() {
             className="my-8 w-full max-w-xl rounded-xl bg-background p-6 shadow-[var(--shadow-card-hover)]"
           >
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-foreground">{editing ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h2>
+              <h2 className="text-xl font-bold text-foreground">
+                {editing ? "Sửa sản phẩm" : "Thêm sản phẩm"}
+              </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -230,13 +270,19 @@ function AdminProducts() {
             </div>
 
             {error && (
-              <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">{error}</p>
+              <p className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive">
+                {error}
+              </p>
             )}
 
             <div className="mt-4 grid gap-4">
               <label className="text-sm font-semibold text-foreground">
                 Tên sản phẩm
-                <input value={name} onChange={(e) => setName(e.target.value)} className={`mt-1 ${inputCls}`} />
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={`mt-1 ${inputCls}`}
+                />
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="text-sm font-semibold text-foreground">
@@ -247,13 +293,20 @@ function AdminProducts() {
                     className={`mt-1 ${inputCls}`}
                   >
                     {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
                     ))}
                   </select>
                 </label>
                 <label className="text-sm font-semibold text-foreground">
                   Giá (₫)
-                  <input inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={`mt-1 ${inputCls}`} />
+                  <input
+                    inputMode="numeric"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className={`mt-1 ${inputCls}`}
+                  />
                 </label>
               </div>
               <label className="text-sm font-semibold text-foreground">
@@ -276,12 +329,21 @@ function AdminProducts() {
               </label>
               {editing && editing.variants.length > 0 && (
                 <p className="text-sm text-muted-foreground">
-                  Biến thể (màu/size/tồn kho) hiện chỉ xem được — máy chủ chưa có chức năng sửa biến thể.
+                  Biến thể (màu/size/tồn kho) hiện chỉ xem được — máy chủ chưa có chức năng sửa biến
+                  thể.
                 </p>
               )}
               <div className="mt-2 flex gap-3">
-                <Button variant="secondary" size="md" onClick={() => setOpen(false)}>Hủy</Button>
-                <Button variant="primary" size="md" className="flex-1" disabled={saving} onClick={() => void save()}>
+                <Button variant="secondary" size="md" onClick={() => setOpen(false)}>
+                  Hủy
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="flex-1"
+                  disabled={saving}
+                  onClick={() => void save()}
+                >
                   {saving ? "Đang lưu..." : editing ? "Lưu thay đổi" : "Tạo sản phẩm"}
                 </Button>
               </div>
