@@ -14,8 +14,10 @@ import {
   type Product,
 } from "@/lib/products";
 import { addToCart } from "@/lib/cart";
+import { displayImage } from "@/lib/images";
 import { breadcrumbLd, pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { colorLabel } from "@/lib/labels";
 
 type Search = { q?: string | undefined; category?: string | undefined };
 
@@ -284,7 +286,7 @@ function ProductListing() {
     })),
     ...colors.map((c) => ({
       key: `co-${c}`,
-      label: c,
+      label: colorLabel(c),
       remove: () => toggle(colors, setColors, c),
     })),
     ...(inStockOnly
@@ -372,7 +374,7 @@ function ProductListing() {
                 selected={colors.includes(c)}
                 onClick={() => toggle(colors, setColors, c)}
               >
-                {c}
+                {colorLabel(c)}
               </OptionChip>
             ))}
           </div>
@@ -652,7 +654,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
     setAdding(true);
     try {
       await addToCart(variant.id);
-      toast.success(`Đã thêm “${product.title}” (${color}, ${size}) vào giỏ hàng`);
+      toast.success(`Đã thêm “${product.title}” (${colorLabel(color)}, ${size}) vào giỏ hàng`);
       onClose();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Chưa thêm được vào giỏ, bạn thử lại nhé.");
@@ -683,7 +685,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
         <img
-          src={product.image}
+          src={displayImage(product.image, product.category, product.id)}
           alt={product.title}
           width={600}
           height={800}
@@ -702,7 +704,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           {product.colors.length > 0 && (
             <fieldset className="mt-6">
               <legend className="mb-2 text-sm text-foreground">
-                Màu: <span className="font-semibold">{color}</span>
+                Màu: <span className="font-semibold">{colorLabel(color)}</span>
               </legend>
               <div className="flex flex-wrap gap-2">
                 {product.colors.map((c) => (
@@ -714,7 +716,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
                       setSize("");
                     }}
                   >
-                    {c}
+                    {colorLabel(c)}
                   </OptionChip>
                 ))}
               </div>

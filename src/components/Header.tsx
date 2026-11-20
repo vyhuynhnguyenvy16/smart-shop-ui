@@ -4,6 +4,7 @@ import { Menu, Search, ShoppingBag, Shield, User, X } from "lucide-react";
 import { CATEGORIES, getProducts, type Product } from "@/lib/products";
 import { cartTotals, detailedCart, useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
+import { displayImage } from "@/lib/images";
 
 function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFocus?: boolean }) {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFoc
                 className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted"
               >
                 <img
-                  src={s.image}
+                  src={displayImage(s.image, s.category, s.id)}
                   alt=""
                   width={40}
                   height={53}

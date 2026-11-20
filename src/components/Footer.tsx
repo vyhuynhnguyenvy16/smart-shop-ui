@@ -67,6 +67,12 @@ export function Footer() {
       </div>
       <div className="container-shop flex flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted-foreground hairline-t">
         <span>© {new Date().getFullYear()} Northline</span>
+        <a
+          href="/products/LICENSE-shrine-images.txt"
+          className="hover:text-foreground hover:underline"
+        >
+          Một phần ảnh sản phẩm: Material Design “Shrine” (Apache-2.0)
+        </a>
       </div>
     </footer>
   );

@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { CATEGORIES, getProducts } from "@/lib/products";
 import { absoluteUrl, jsonLd, pageHead } from "@/lib/seo";
-import hero from "@/assets/fashion-apparel-1.webp";
-import sneakers from "@/assets/fashion-shoes-1.webp";
-import backpack from "@/assets/fashion-accessories-1.webp";
-import outerwear from "@/assets/fashion-outerwear-1.webp";
+import { seedImagePath } from "@/lib/catalog-seed";
+
+// Product photography: Material Design "Shrine" set (Apache-2.0) + project assets — see src/lib/catalog-seed.ts.
+const hero = "/products/hero-so-mi-trang.webp";
 
 export const Route = createFileRoute("/")({
   // Backend offline must not blank the home page; show the rest of the page instead.
@@ -39,10 +39,10 @@ export const Route = createFileRoute("/")({
 
 // Category tiles: the link text names the category, so the photos are decorative (alt="").
 const featuredCategories: Array<{ name: (typeof CATEGORIES)[number]; image: string }> = [
-  { name: "Áo Quần", image: hero },
-  { name: "Áo Khoác", image: outerwear },
-  { name: "Giày Dép", image: sneakers },
-  { name: "Túi Xách", image: backpack },
+  { name: "Áo Quần", image: seedImagePath("so-mi-chambray-nu") },
+  { name: "Áo Khoác", image: seedImagePath("mang-to-dang-dai") },
+  { name: "Giày Dép", image: seedImagePath("giay-sneaker-da-xam") },
+  { name: "Túi Xách", image: seedImagePath("balo-da-vagabond") },
 ];
 const otherCategories = CATEGORIES.filter((c) => !featuredCategories.some((f) => f.name === c));
 
@@ -52,7 +52,7 @@ function Home() {
   return (
     <>
       <section className="container-shop grid gap-8 pb-12 pt-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:items-center md:gap-12 md:pb-16 md:pt-12">
-        <div className="order-2 md:order-1">
+        <div className="hero-enter order-2 md:order-1">
           <h1 className="font-display text-[2.5rem] leading-[1.05] text-foreground sm:text-5xl lg:text-[3.5rem]">
             Ít món hơn,
             <br />
@@ -69,9 +69,7 @@ function Home() {
               </Link>
             </Button>
             <Button variant="secondary" size="md" asChild className="h-12 px-8">
-              <Link to="/products" search={{ category: "Áo Khoác" }}>
-                Xem áo khoác
-              </Link>
+              <a href="#new-heading">Xem hàng mới về</a>
             </Button>
           </div>
           <ul className="mt-10 grid gap-2 hairline-t pt-5 text-sm text-muted-foreground sm:grid-cols-3 sm:gap-4">
@@ -83,9 +81,9 @@ function Home() {
         <div className="order-1 aspect-[4/3] overflow-hidden bg-muted sm:aspect-[4/5] md:order-2">
           <img
             src={hero}
-            alt="Áo sơ mi trắng trong bộ sưu tập Northline"
-            width={768}
-            height={960}
+            alt="Người mẫu mặc sơ mi trắng cổ đức và quần jean"
+            width={664}
+            height={988}
             fetchPriority="high"
             className="h-full w-full object-cover object-[50%_20%]"
           />
@@ -130,6 +128,36 @@ function Home() {
               </span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="container-shop section-y pt-0" aria-labelledby="edit-heading">
+        <div className="grid items-center gap-8 bg-card hairline md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="aspect-[3/2] overflow-hidden bg-muted">
+            <img
+              src="/products/editorial-ao-khoac.webp"
+              alt="Người mẫu mặc áo khoác field xanh rêu bên ngoài áo thun trắng"
+              width={988}
+              height={658}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="px-6 pb-8 md:py-10 md:pl-0 md:pr-10">
+            <h2 id="edit-heading" className="font-display text-2xl text-foreground md:text-3xl">
+              Áo khoác cho mùa se lạnh
+            </h2>
+            <p className="mt-3 max-w-sm text-base text-muted-foreground">
+              Field jacket, măng tô, blazer và cardigan — những lớp khoác ngoài phom gọn, phối được
+              với gần như mọi thứ trong tủ đồ.
+            </p>
+            <Button variant="primary" size="md" asChild className="mt-6 h-12 px-8">
+              <Link to="/products" search={{ category: "Áo Khoác" }}>
+                Xem áo khoác
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 

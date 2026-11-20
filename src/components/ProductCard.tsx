@@ -3,7 +3,8 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Rating } from "@/components/Rating";
-import { fallbackImageFor, formatPrice, type Product } from "@/lib/products";
+import { formatPrice, type Product } from "@/lib/products";
+import { displayImage, photoFor } from "@/lib/images";
 import { addToCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
 
@@ -50,15 +51,15 @@ export function ProductCard({
       <div className="relative overflow-hidden bg-muted">
         <Link to="/products/$slug" params={{ slug: product.slug }} tabIndex={-1} aria-hidden="true">
           <img
-            src={product.image}
-            data-fallback={fallbackImageFor(product.category, product.id)}
+            src={displayImage(product.image, product.category, product.id)}
+            data-fallback={photoFor(product.category, product.id)}
             alt=""
             width={600}
             height={800}
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             className={cn(
-              "aspect-[3/4] w-full object-cover transition-opacity duration-300 group-hover:opacity-90",
+              "aspect-[3/4] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]",
               out && "opacity-60",
             )}
           />

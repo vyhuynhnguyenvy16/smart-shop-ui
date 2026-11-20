@@ -6,6 +6,7 @@ import { cartTotals, clearCart, detailedCart, useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
 import { estimateShipping } from "@/lib/shipping";
 import { cn } from "@/lib/utils";
+import { colorLabel } from "@/lib/labels";
 import {
   createOrder,
   getAddresses,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/api-client";
 import { useRequireAuth } from "@/lib/auth";
 import { pageHead } from "@/lib/seo";
+import { displayImage } from "@/lib/images";
 
 export const Route = createFileRoute("/checkout/")({
   head: () =>
@@ -412,7 +414,7 @@ function CheckoutPage() {
               <li key={i.itemId} className="flex items-center gap-3 text-sm">
                 <span className="relative shrink-0">
                   <img
-                    src={i.product.image}
+                    src={displayImage(i.product.image, i.product.category, i.product.id)}
                     alt=""
                     width={48}
                     height={64}
@@ -425,7 +427,9 @@ function CheckoutPage() {
                 <span className="min-w-0 flex-1">
                   <span className="line-clamp-2-title text-foreground">{i.product.title}</span>
                   <span className="block text-xs text-muted-foreground">
-                    {[i.item.color, i.item.size].filter(Boolean).join(" · ")}
+                    {[i.item.color && colorLabel(i.item.color), i.item.size]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
                 </span>
                 <span className="tabular text-foreground">{formatPrice(i.item.subtotal)}</span>

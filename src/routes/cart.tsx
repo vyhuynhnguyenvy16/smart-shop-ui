@@ -9,6 +9,8 @@ import { getApiErrorMessage } from "@/lib/api-client";
 import { useRequireAuth } from "@/lib/auth";
 import { pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { colorLabel } from "@/lib/labels";
+import { displayImage } from "@/lib/images";
 
 export const Route = createFileRoute("/cart")({
   head: () =>
@@ -98,7 +100,7 @@ function CartPage() {
                     aria-hidden="true"
                   >
                     <img
-                      src={product.image}
+                      src={displayImage(product.image, product.category, product.id)}
                       alt=""
                       width={96}
                       height={128}
@@ -117,7 +119,7 @@ function CartPage() {
                           {product.title}
                         </Link>
                         <p className="mt-1 text-sm text-muted-foreground">
-                          {[item.color, item.size && `Size ${item.size}`]
+                          {[item.color && colorLabel(item.color), item.size && `Size ${item.size}`]
                             .filter(Boolean)
                             .join(" · ")}
                         </p>

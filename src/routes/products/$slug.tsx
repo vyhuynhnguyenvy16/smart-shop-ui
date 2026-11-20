@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Rating } from "@/components/Rating";
 import { ProductCard } from "@/components/ProductCard";
+import { displayImage, photoFor } from "@/lib/images";
 import {
-  fallbackImageFor,
   findVariant,
   formatPrice,
   getProductBySlug,
@@ -17,6 +17,7 @@ import {
 import { addToCart } from "@/lib/cart";
 import { absoluteUrl, breadcrumbLd, clip, jsonLd, pageHead } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { colorLabel } from "@/lib/labels";
 
 const SIZE_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "FREESIZE"];
 const sortSizes = (sizes: string[]) =>
@@ -126,8 +127,10 @@ function ProductDetail() {
   const sizes = useMemo(() => sortSizes(product.sizes), [product.sizes]);
   const variant = size ? findVariant(product, color, size) : undefined;
   const { low, high } = priceRange(product);
-  const fallback = fallbackImageFor(product.category, product.id);
-  const gallery = product.images.length ? product.images : [product.image];
+  const fallback = photoFor(product.category, product.id);
+  const gallery = (product.images.length ? product.images : [product.image]).map((src, i) =>
+    displayImage(src, product.category, product.id + i),
+  );
   const productOut = product.stock === "out";
   const variantOut = variant ? variant.stock <= 0 : false;
   const sizeInStock = (s: string) =>
@@ -151,7 +154,7 @@ function ProductDetail() {
       if (goCheckout) {
         navigate({ to: "/checkout" });
       } else {
-        toast.success(`Đã thêm vào giỏ: ${product.title} (${color}, ${size})`, {
+        toast.success(`Đã thêm vào giỏ: ${product.title} (${colorLabel(color)}, ${size})`, {
           action: { label: "Xem giỏ hàng", onClick: () => navigate({ to: "/cart" }) },
         });
       }
@@ -269,7 +272,7 @@ function ProductDetail() {
           {product.colors.length > 0 && (
             <fieldset className="mt-8">
               <legend className="mb-3 text-sm text-foreground">
-                Màu sắc: <span className="font-semibold">{color}</span>
+                Màu sắc: <span className="font-semibold">{colorLabel(color)}</span>
               </legend>
               <div className="flex flex-wrap gap-2">
                 {product.colors.map((c) => {
@@ -297,7 +300,7 @@ function ProductDetail() {
                         !anyStock && "text-muted-foreground line-through",
                       )}
                     >
-                      {c}
+                      {colorLabel(c)}
                       {!anyStock && <span className="sr-only"> (hết hàng)</span>}
                     </button>
                   );
@@ -413,7 +416,7 @@ function ProductDetail() {
               {product.colors.length > 0 && (
                 <>
                   <dt className="text-muted-foreground">Màu có sẵn</dt>
-                  <dd className="text-foreground">{product.colors.join(", ")}</dd>
+                  <dd className="text-foreground">{product.colors.map(colorLabel).join(", ")}</dd>
                 </>
               )}
               {sizes.length > 0 && (
@@ -451,7 +454,7 @@ function ProductDetail() {
           <div className="min-w-0">
             <p className="tabular text-base font-semibold text-foreground">{shownPrice}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {[color, size || "chưa chọn size"].filter(Boolean).join(" · ")}
+              {[color && colorLabel(color), size || "chưa chọn size"].filter(Boolean).join(" · ")}
             </p>
           </div>
           <Button
