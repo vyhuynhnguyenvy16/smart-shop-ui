@@ -101,12 +101,12 @@ function OptionChip({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center border px-3 text-sm transition-colors",
+        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md bg-card px-3.5 text-body transition-[box-shadow,background-color,color] duration-150 ease-standard",
         selected
-          ? "border-foreground bg-foreground text-background"
-          : "border-border text-foreground hover:border-foreground",
+          ? "bg-accent font-semibold text-accent-foreground shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
+          : "text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:shadow-[inset_0_0_0_1px_var(--color-foreground)]",
         disabled &&
-          "cursor-not-allowed text-muted-foreground line-through opacity-50 hover:border-border",
+          "cursor-not-allowed bg-muted text-muted-foreground line-through hover:shadow-[inset_0_0_0_1px_var(--color-border)]",
       )}
     >
       {children}
@@ -117,9 +117,9 @@ function OptionChip({
 function SkeletonCard() {
   return (
     <div aria-hidden="true">
-      <div className="skeleton aspect-[3/4] w-full" />
-      <div className="skeleton mt-3 h-4 w-4/5" />
-      <div className="skeleton mt-2 h-4 w-1/3" />
+      <div className="skeleton aspect-[3/4] w-full rounded-lg" />
+      <div className="skeleton mt-3 h-4 w-4/5 rounded-sm" />
+      <div className="skeleton mt-2 h-4 w-1/3 rounded-sm" />
     </div>
   );
 }
@@ -308,12 +308,12 @@ function ProductListing() {
   const filters = (
     <div className="space-y-8">
       <fieldset>
-        <legend className="mb-2 text-sm font-semibold text-foreground">Danh mục</legend>
+        <legend className="mb-2 text-body-sm font-semibold text-foreground">Danh mục</legend>
         <div className="grid">
           {CATEGORIES.map((c) => (
             <label
               key={c}
-              className="flex min-h-11 items-center gap-3 text-sm text-foreground hover:text-primary"
+              className="flex min-h-11 items-center gap-3 text-body-sm text-foreground hover:text-primary"
             >
               <input
                 type="checkbox"
@@ -330,8 +330,8 @@ function ProductListing() {
       </fieldset>
 
       <fieldset>
-        <legend className="mb-2 text-sm font-semibold text-foreground">Giá tối đa</legend>
-        <p className="tabular mb-1 text-sm text-muted-foreground" aria-live="polite">
+        <legend className="mb-2 text-body-sm font-semibold text-foreground">Giá tối đa</legend>
+        <p className="tabular mb-1 text-body-sm text-muted-foreground" aria-live="polite">
           {maxPrice < PRICE_CEILING ? `Dưới ${formatPrice(maxPrice)}` : "Mọi mức giá"}
         </p>
         <input
@@ -349,7 +349,7 @@ function ProductListing() {
 
       {availableSizes.length > 0 && (
         <fieldset>
-          <legend className="mb-3 text-sm font-semibold text-foreground">Size</legend>
+          <legend className="mb-3 text-body-sm font-semibold text-foreground">Size</legend>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((s) => (
               <OptionChip
@@ -366,7 +366,7 @@ function ProductListing() {
 
       {availableColors.length > 0 && (
         <fieldset>
-          <legend className="mb-3 text-sm font-semibold text-foreground">Màu sắc</legend>
+          <legend className="mb-3 text-body-sm font-semibold text-foreground">Màu sắc</legend>
           <div className="flex flex-wrap gap-2">
             {availableColors.map((c) => (
               <OptionChip
@@ -381,7 +381,7 @@ function ProductListing() {
         </fieldset>
       )}
 
-      <label className="flex min-h-11 items-center gap-3 text-sm text-foreground hover:text-primary">
+      <label className="flex min-h-11 items-center gap-3 text-body-sm text-foreground hover:text-primary">
         <input
           type="checkbox"
           checked={inStockOnly}
@@ -395,7 +395,7 @@ function ProductListing() {
 
   return (
     <div className="container-shop pb-12 pt-6">
-      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="text-body-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
             <Link to="/" className="hover:text-foreground hover:underline">
@@ -427,8 +427,8 @@ function ProductListing() {
 
       <header className="mt-6 flex flex-wrap items-end justify-between gap-4 hairline-b pb-6">
         <div>
-          <h1 className="font-display text-3xl text-foreground md:text-4xl">{heading}</h1>
-          <p className="tabular mt-2 min-h-5 text-sm text-muted-foreground" aria-live="polite">
+          <h1 className="text-h1 text-foreground">{heading}</h1>
+          <p className="tabular mt-2 min-h-5 text-body-sm text-muted-foreground" aria-live="polite">
             {loading
               ? "Đang tải sản phẩm…"
               : error
@@ -449,12 +449,12 @@ function ProductListing() {
             <SlidersHorizontal aria-hidden="true" /> Bộ lọc
             {chips.length > 0 && <span className="tabular">({chips.length})</span>}
           </Button>
-          <label className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+          <label className="ml-auto flex items-center gap-2 text-body-sm text-muted-foreground">
             Sắp xếp
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortId)}
-              className="h-11 border-b border-input bg-transparent pr-2 text-sm text-foreground focus:border-foreground"
+              className="h-11 rounded-md bg-card pl-3 pr-8 text-body text-foreground shadow-[inset_0_0_0_1px_var(--color-input)] focus:shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
             >
               {SORTS.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -474,7 +474,7 @@ function ProductListing() {
               type="button"
               onClick={chip.remove}
               aria-label={`Bỏ lọc ${chip.label}`}
-              className="inline-flex min-h-9 items-center gap-1.5 border border-border bg-card px-3 text-sm text-foreground hover:border-foreground"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-secondary pl-3.5 pr-3 text-body-sm text-foreground transition-colors duration-150 hover:bg-border"
             >
               {chip.label}
               <X className="h-3.5 w-3.5" aria-hidden="true" />
@@ -483,7 +483,7 @@ function ProductListing() {
           <button
             type="button"
             onClick={clearAll}
-            className="min-h-9 px-2 text-sm text-primary underline-offset-4 hover:underline"
+            className="min-h-9 px-2 text-body-sm font-semibold text-primary underline-offset-4 hover:underline"
           >
             Xóa tất cả
           </button>
@@ -497,15 +497,15 @@ function ProductListing() {
 
         <section className="min-w-0 flex-1" aria-label="Danh sách sản phẩm" aria-busy={loading}>
           {loading ? (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12">
               {Array.from({ length: 6 }, (_, i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
           ) : error ? (
             <div className="hairline p-8 text-center" role="alert">
-              <h2 className="font-display text-xl text-foreground">Không tải được sản phẩm</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <h2 className="text-h3 text-foreground">Không tải được sản phẩm</h2>
+              <p className="mt-2 text-body-sm text-muted-foreground">
                 Máy chủ chưa phản hồi ({error}). Bạn thử lại sau ít giây nhé.
               </p>
               <Button
@@ -519,8 +519,8 @@ function ProductListing() {
             </div>
           ) : visible.length === 0 ? (
             <div className="hairline p-8 text-center">
-              <h2 className="font-display text-xl text-foreground">Không có sản phẩm phù hợp</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <h2 className="text-h3 text-foreground">Không có sản phẩm phù hợp</h2>
+              <p className="mt-2 text-body-sm text-muted-foreground">
                 {chips.length > 0
                   ? "Thử bỏ bớt bộ lọc hoặc chọn danh mục khác."
                   : "Danh mục này chưa có sản phẩm. Xem các danh mục khác nhé."}
@@ -539,13 +539,13 @@ function ProductListing() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-x-6 md:gap-y-12">
                 {visible.map((p, i) => (
                   <ProductCard key={p.id} product={p} onQuickView={setQuick} priority={i < 3} />
                 ))}
               </div>
               <div className="mt-12 flex flex-col items-center gap-3 text-center">
-                <p className="tabular text-sm text-muted-foreground">
+                <p className="tabular text-body-sm text-muted-foreground">
                   Đã hiển thị {items.length} / {total} sản phẩm
                 </p>
                 {page + 1 < pageCount && (
@@ -610,16 +610,20 @@ function FilterDrawer({
   const ref = useDialog(onClose);
   return (
     <div className="fixed inset-0 z-50 flex lg:hidden">
-      <div className="flex-1 bg-foreground/40" onClick={onClose} aria-hidden="true" />
+      <div
+        className="flex-1 bg-foreground/40 animate-in fade-in-0 duration-300"
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <div
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-label="Bộ lọc sản phẩm"
-        className="flex w-[22rem] max-w-[90%] flex-col bg-background"
+        className="flex w-[22.5rem] max-w-[90vw] flex-col rounded-l-xl bg-background shadow-3 animate-in slide-in-from-right duration-300 ease-enter"
       >
         <div className="flex items-center justify-between hairline-b px-6 py-3">
-          <span className="font-display text-lg">Bộ lọc</span>
+          <span className="text-h3">Bộ lọc</span>
           <button
             type="button"
             onClick={onClose}
@@ -665,7 +669,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 animate-in fade-in-0 duration-300 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -673,14 +677,14 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-title"
-        className="relative grid max-h-[90dvh] w-full max-w-3xl gap-6 overflow-y-auto bg-background p-6 sm:grid-cols-2"
+        className="relative grid max-h-[90dvh] w-full max-w-3xl gap-6 overflow-y-auto rounded-t-xl bg-background p-6 shadow-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-300 ease-enter sm:rounded-xl sm:zoom-in-[0.97] sm:slide-in-from-bottom-0"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Đóng"
-          className="absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center bg-background/80"
+          className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-card/90 shadow-1 transition-colors duration-150 hover:bg-secondary"
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -689,11 +693,11 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           alt={product.title}
           width={600}
           height={800}
-          className="aspect-[3/4] w-full bg-muted object-cover"
+          className="aspect-[3/4] w-full rounded-lg bg-muted object-cover"
         />
         <div className="flex flex-col">
-          <p className="text-sm text-muted-foreground">{product.category}</p>
-          <h2 id="quick-title" className="font-display mt-1 text-2xl leading-snug text-foreground">
+          <p className="text-body-sm text-muted-foreground">{product.category}</p>
+          <h2 id="quick-title" className="mt-1 text-h2 text-foreground">
             {product.title}
           </h2>
           <p className="tabular mt-3 text-xl font-semibold text-foreground">
@@ -703,7 +707,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
 
           {product.colors.length > 0 && (
             <fieldset className="mt-6">
-              <legend className="mb-2 text-sm text-foreground">
+              <legend className="mb-2 text-body-sm text-foreground">
                 Màu: <span className="font-semibold">{colorLabel(color)}</span>
               </legend>
               <div className="flex flex-wrap gap-2">
@@ -725,7 +729,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
 
           {product.sizes.length > 0 && (
             <fieldset className="mt-4">
-              <legend className="mb-2 text-sm text-foreground">
+              <legend className="mb-2 text-body-sm text-foreground">
                 Size: <span className="font-semibold">{size || "chưa chọn"}</span>
               </legend>
               <div className="flex flex-wrap gap-2">

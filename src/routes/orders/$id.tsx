@@ -63,7 +63,7 @@ function OrderDetailPage() {
         ← Tất cả đơn hàng
       </Link>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-3xl text-foreground md:text-4xl">#ORD-{order.id}</h1>
+        <h1 className="text-h1 text-foreground">#ORD-{order.id}</h1>
         <span className={cn(StatusBadgeClass(status))}>{STATUS_LABEL[status]}</span>
       </div>
       <p className="mt-2 text-sm text-muted-foreground">
@@ -78,7 +78,7 @@ function OrderDetailPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="hairline bg-card p-6">
-          <h2 className="font-display text-xl text-foreground">Sản phẩm</h2>
+          <h2 className="text-h3 text-foreground">Sản phẩm</h2>
           <ul className="mt-4 grid gap-3">
             {order.items.map((i) => (
               <li key={i.id} className="flex justify-between gap-4 text-sm">
@@ -96,7 +96,7 @@ function OrderDetailPage() {
         </div>
 
         <aside className="h-fit hairline bg-card p-6">
-          <h2 className="font-display text-xl text-foreground">Địa chỉ giao hàng</h2>
+          <h2 className="text-h3 text-foreground">Địa chỉ giao hàng</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {order.shippingRecipientName}
             <br />
@@ -104,7 +104,7 @@ function OrderDetailPage() {
             <br />
             {order.shippingAddressLine}, {order.shippingCity}
           </p>
-          <h2 className="font-display mt-6 text-xl text-foreground">Thanh toán</h2>
+          <h2 className="mt-6 text-h3 text-foreground">Thanh toán</h2>
           <dl className="mt-2 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Tạm tính</dt>

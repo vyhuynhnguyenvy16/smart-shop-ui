@@ -47,9 +47,9 @@ function CartPage() {
   };
 
   return (
-    <div className="container-shop pb-28 pt-6 md:pb-12">
+    <div className="container-shop pb-32 pt-6 md:pb-12">
       <ol
-        className="flex items-center gap-2 text-sm text-muted-foreground"
+        className="flex items-center gap-2 text-body-sm text-muted-foreground"
         aria-label="Các bước đặt hàng"
       >
         <li aria-current="step" className="font-semibold text-foreground">
@@ -60,14 +60,14 @@ function CartPage() {
         <li aria-hidden="true">—</li>
         <li>3. Xác nhận</li>
       </ol>
-      <h1 className="font-display mt-4 text-3xl text-foreground md:text-4xl">
+      <h1 className="mt-4 text-h1 text-foreground">
         Giỏ hàng{count > 0 && <span className="tabular text-muted-foreground"> ({count})</span>}
       </h1>
 
       {error && (
         <p
           role="alert"
-          className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-body-sm text-destructive"
         >
           {error}
         </p>
@@ -75,11 +75,11 @@ function CartPage() {
 
       {items.length === 0 ? (
         <div className="mt-8 hairline p-10 text-center">
-          <h2 className="font-display text-xl text-foreground">Giỏ hàng đang trống</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <h2 className="text-h3 text-foreground">Giỏ hàng đang trống</h2>
+          <p className="mt-2 text-body-sm text-muted-foreground">
             Thêm vài món bạn thích rồi quay lại đây nhé.
           </p>
-          <Button variant="primary" size="md" asChild className="mt-6 h-12 px-8">
+          <Button variant="primary" size="lg" asChild className="mt-6 px-8">
             <Link to="/products" search={{}}>
               Bắt đầu mua sắm
             </Link>
@@ -105,7 +105,7 @@ function CartPage() {
                       width={96}
                       height={128}
                       loading="lazy"
-                      className="aspect-[3/4] w-24 shrink-0 bg-muted object-cover"
+                      className="aspect-[3/4] w-24 shrink-0 rounded-md bg-muted object-cover"
                     />
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col">
@@ -118,7 +118,7 @@ function CartPage() {
                         >
                           {product.title}
                         </Link>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-body-sm text-muted-foreground">
                           {[item.color && colorLabel(item.color), item.size && `Size ${item.size}`]
                             .filter(Boolean)
                             .join(" · ")}
@@ -129,12 +129,12 @@ function CartPage() {
                       </p>
                     </div>
                     {qty > 1 && (
-                      <p className="tabular mt-1 text-sm text-muted-foreground">
+                      <p className="tabular mt-1 text-body-sm text-muted-foreground">
                         {formatPrice(item.unitPrice)} / sản phẩm
                       </p>
                     )}
                     <div className="mt-auto flex items-center justify-between gap-3 pt-3">
-                      <div className="flex items-center border border-border">
+                      <div className="flex items-center rounded-md bg-card shadow-[inset_0_0_0_1px_var(--color-border)]">
                         <button
                           type="button"
                           disabled={busy || qty <= 1}
@@ -165,7 +165,7 @@ function CartPage() {
                         type="button"
                         disabled={busy}
                         onClick={() => void run(itemId, () => removeFromCart(itemId))}
-                        className="flex min-h-11 items-center gap-2 text-sm text-muted-foreground hover:text-destructive"
+                        className="flex min-h-11 items-center gap-2 text-body-sm text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" /> Xóa
                       </button>
@@ -183,11 +183,11 @@ function CartPage() {
             className="h-fit hairline bg-card p-6 lg:sticky lg:top-32"
             aria-labelledby="summary-heading"
           >
-            <h2 id="summary-heading" className="font-display text-xl text-foreground">
+            <h2 id="summary-heading" className="text-h3 text-foreground">
               Tóm tắt đơn hàng
             </h2>
             <div className="mt-4">
-              <p className="text-sm text-foreground">
+              <p className="text-body-sm text-foreground">
                 {remaining > 0
                   ? `Mua thêm ${formatPrice(remaining)} để được miễn phí vận chuyển`
                   : "Đơn hàng được miễn phí vận chuyển"}
@@ -207,7 +207,7 @@ function CartPage() {
               </div>
             </div>
 
-            <dl className="tabular mt-6 space-y-2 hairline-t pt-4 text-sm">
+            <dl className="tabular mt-6 space-y-2 hairline-t pt-4 text-body-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Tạm tính</dt>
                 <dd className="text-foreground">{formatPrice(subtotal)}</dd>
@@ -229,7 +229,7 @@ function CartPage() {
               Tổng tiền cuối cùng được hệ thống xác nhận khi bạn đặt hàng.
             </p>
 
-            <Button variant="primary" size="md" asChild className="mt-6 h-12 w-full">
+            <Button variant="primary" size="lg" asChild className="mt-6 w-full">
               <Link to="/checkout">Tiến hành đặt hàng</Link>
             </Button>
             <Button variant="tertiary" size="sm" asChild className="mt-2 w-full">

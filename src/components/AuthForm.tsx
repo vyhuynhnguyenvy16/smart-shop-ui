@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getApiErrorMessage, loginUser, registerUser } from "@/lib/api-client";
 
 const inputClass =
-  "h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground";
+  "h-12 w-full rounded-md border border-input bg-card px-3.5 text-base outline-none transition-[border-color,box-shadow] duration-150 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_20%,transparent)]";
 
 export function AuthForm({ mode, redirect }: { mode: "login" | "register"; redirect?: string }) {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export function AuthForm({ mode, redirect }: { mode: "login" | "register"; redir
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
       <div className="mx-auto w-full max-w-md hairline bg-card p-6 sm:p-8">
-        <h1 className="font-display text-3xl text-foreground">
+        <h1 className="text-h1 text-foreground">
           {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">

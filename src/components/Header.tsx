@@ -60,7 +60,7 @@ function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFoc
       >
         <Search
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground"
         />
         <input
           type="search"
@@ -79,13 +79,13 @@ function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFoc
           aria-controls="search-suggestions"
           autoComplete="off"
           autoFocus={autoFocus}
-          className="h-11 w-full border-b border-input bg-transparent pl-6 pr-2 text-base outline-none placeholder:text-muted-foreground focus:border-foreground focus-visible:outline-none"
+          className="h-11 w-full rounded-full bg-card pl-11 pr-4 text-base shadow-[inset_0_0_0_1px_var(--color-border)] outline-none transition-shadow duration-150 placeholder:text-muted-foreground hover:shadow-[inset_0_0_0_1px_var(--color-input)] focus:shadow-[inset_0_0_0_1.5px_var(--color-primary),0_0_0_4px_color-mix(in_srgb,var(--color-primary)_15%,transparent)] focus-visible:outline-none"
         />
       </form>
       {showList && (
         <ul
           id="search-suggestions"
-          className="absolute inset-x-0 top-12 z-50 overflow-hidden border border-border bg-background shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]"
+          className="absolute inset-x-0 top-[3.25rem] z-50 overflow-hidden rounded-lg bg-popover p-1.5 shadow-2 animate-in fade-in-0 slide-in-from-top-1 duration-200 ease-enter"
         >
           {suggestions.map((s) => (
             <li key={s.id}>
@@ -97,7 +97,7 @@ function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFoc
                   setOpen(false);
                   onNavigate?.();
                 }}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-muted"
+                className="flex items-center gap-3 rounded-md px-2.5 py-2 text-body-sm transition-colors duration-150 hover:bg-secondary"
               >
                 <img
                   src={displayImage(s.image, s.category, s.id)}
@@ -105,7 +105,7 @@ function SearchBox({ onNavigate, autoFocus }: { onNavigate?: () => void; autoFoc
                   width={40}
                   height={53}
                   loading="lazy"
-                  className="h-[53px] w-10 bg-muted object-cover"
+                  className="h-[53px] w-10 rounded-sm bg-muted object-cover"
                 />
                 <span className="line-clamp-2-title flex-1">{s.title}</span>
               </Link>
@@ -137,15 +137,15 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 bg-background hairline-b">
-      <p className="bg-foreground px-4 py-2 text-center text-[0.8125rem] text-background">
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md hairline-b supports-[backdrop-filter]:bg-background/85">
+      <p className="flex min-h-9 items-center justify-center bg-announce px-4 py-2 text-center text-label-sm font-normal text-primary-foreground">
         <span className="sm:hidden">Freeship từ 500.000₫ · Đổi trả 30 ngày</span>
         <span className="hidden sm:inline">
           Miễn phí vận chuyển cho đơn từ 500.000₫ · Đổi trả miễn phí trong 30 ngày
         </span>
       </p>
 
-      <div className="container-shop flex h-16 items-center gap-2 md:h-20 md:gap-4">
+      <div className="container-shop flex h-16 items-center gap-2 md:h-[4.5rem] md:gap-4">
         <button
           type="button"
           className="-ml-2.5 flex h-11 w-11 items-center justify-center text-foreground lg:hidden"
@@ -159,8 +159,7 @@ export function Header() {
 
         <Link
           to="/"
-          className="font-display text-2xl tracking-tight text-foreground"
-          style={{ fontWeight: 500 }}
+          className="text-[1.375rem] font-bold tracking-[-0.02em] text-foreground"
           aria-label="Northline — trang chủ"
         >
           Northline
@@ -176,10 +175,10 @@ export function Header() {
                 search={{ category: c }}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "whitespace-nowrap border-b pb-1 text-sm transition-colors",
+                  "relative whitespace-nowrap py-2 text-body-sm font-medium transition-colors duration-150 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-primary after:transition-transform after:duration-200 after:ease-standard",
                   active
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:border-foreground hover:text-foreground",
+                    ? "text-foreground after:scale-x-100"
+                    : "text-muted-foreground after:scale-x-0 hover:text-foreground hover:after:scale-x-100",
                 )}
               >
                 {c}
@@ -196,27 +195,28 @@ export function Header() {
           <Link
             to="/auth"
             aria-label="Tài khoản"
-            className="flex h-11 w-11 items-center justify-center text-foreground transition-colors hover:text-primary"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors duration-150 hover:bg-secondary"
           >
             <User className="h-[22px] w-[22px]" />
           </Link>
           <Link
             to="/admin/orders"
             aria-label="Trang quản trị"
-            className="hidden h-11 w-11 items-center justify-center text-muted-foreground transition-colors hover:text-primary md:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-secondary hover:text-foreground md:flex"
           >
             <Shield className="h-5 w-5" />
           </Link>
           <Link
             to="/cart"
             aria-label={count > 0 ? `Giỏ hàng, ${count} sản phẩm` : "Giỏ hàng trống"}
-            className="relative -mr-2.5 flex h-11 w-11 items-center justify-center text-foreground transition-colors hover:text-primary"
+            className="relative -mr-2.5 flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors duration-150 hover:bg-secondary"
           >
             <ShoppingBag className="h-[22px] w-[22px]" />
             {count > 0 && (
               <span
+                key={count}
                 aria-hidden="true"
-                className="tabular absolute right-0.5 top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[0.6875rem] font-semibold leading-none text-primary-foreground"
+                className="tabular animate-bump absolute right-0.5 top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[0.6875rem] font-semibold leading-none text-primary-foreground"
               >
                 {count > 99 ? "99+" : count}
               </span>
@@ -226,7 +226,10 @@ export function Header() {
       </div>
 
       {open && (
-        <div id="mobile-menu" className="hairline-t bg-background lg:hidden">
+        <div
+          id="mobile-menu"
+          className="hairline-t bg-background shadow-2 animate-in fade-in-0 slide-in-from-top-2 duration-200 ease-enter lg:hidden"
+        >
           <div className="container-shop py-4 md:hidden">
             <SearchBox onNavigate={() => setOpen(false)} />
           </div>

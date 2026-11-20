@@ -179,8 +179,11 @@ function ProductDetail() {
         : "Thêm vào giỏ hàng";
 
   return (
-    <div className="pb-28 md:pb-0">
-      <nav aria-label="Breadcrumb" className="container-shop pt-6 text-sm text-muted-foreground">
+    <div className="pb-36 md:pb-0">
+      <nav
+        aria-label="Breadcrumb"
+        className="container-shop pt-6 text-body-sm text-muted-foreground"
+      >
         <ol className="flex flex-wrap items-center gap-1.5">
           <li>
             <Link to="/" className="hover:text-foreground hover:underline">
@@ -214,7 +217,7 @@ function ProductDetail() {
             width={900}
             height={1200}
             fetchPriority="high"
-            className="aspect-[3/4] w-full bg-muted object-cover"
+            className="aspect-[3/4] w-full rounded-lg bg-muted object-cover animate-in fade-in-0 duration-200"
           />
           {gallery.length > 1 && (
             <div className="mt-3 flex gap-2 overflow-x-auto" role="group" aria-label="Ảnh sản phẩm">
@@ -226,8 +229,10 @@ function ProductDetail() {
                   aria-label={`Xem ảnh ${i + 1}`}
                   aria-current={i === active}
                   className={cn(
-                    "w-[4.5rem] shrink-0 overflow-hidden border-2",
-                    i === active ? "border-foreground" : "border-transparent hover:border-border",
+                    "w-[4.5rem] shrink-0 overflow-hidden rounded-md transition-shadow duration-150",
+                    i === active
+                      ? "shadow-[0_0_0_2px_var(--color-primary)]"
+                      : "shadow-[0_0_0_1px_var(--color-border)] hover:shadow-[0_0_0_1px_var(--color-foreground)]",
                   )}
                 >
                   <img
@@ -246,16 +251,14 @@ function ProductDetail() {
         </div>
 
         <div>
-          <p className="text-sm text-muted-foreground">{product.category}</p>
-          <h1 className="font-display mt-1 text-3xl leading-tight text-foreground md:text-[2.25rem]">
-            {product.title}
-          </h1>
+          <p className="text-body-sm font-medium text-primary">{product.category}</p>
+          <h1 className="mt-1 text-h1 text-foreground">{product.title}</h1>
           <Rating value={product.rating} count={product.reviews} className="mt-3" />
 
-          <p className="tabular mt-4 text-2xl font-semibold text-foreground" aria-live="polite">
+          <p className="mt-4 text-price-lg text-foreground" aria-live="polite">
             {shownPrice}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-body-sm text-muted-foreground">
             {productOut
               ? "Sản phẩm tạm hết hàng."
               : variant
@@ -271,7 +274,7 @@ function ProductDetail() {
 
           {product.colors.length > 0 && (
             <fieldset className="mt-8">
-              <legend className="mb-3 text-sm text-foreground">
+              <legend className="mb-3 text-body-sm text-foreground">
                 Màu sắc: <span className="font-semibold">{colorLabel(color)}</span>
               </legend>
               <div className="flex flex-wrap gap-2">
@@ -293,10 +296,10 @@ function ProductDetail() {
                           setSize("");
                       }}
                       className={cn(
-                        "inline-flex min-h-11 items-center border px-4 text-sm transition-colors",
+                        "inline-flex min-h-11 items-center rounded-md bg-card px-4 text-body transition-[box-shadow,background-color,color] duration-150 ease-standard",
                         c === color
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border text-foreground hover:border-foreground",
+                          ? "bg-accent font-semibold text-accent-foreground shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
+                          : "text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:shadow-[inset_0_0_0_1px_var(--color-foreground)]",
                         !anyStock && "text-muted-foreground line-through",
                       )}
                     >
@@ -315,7 +318,7 @@ function ProductDetail() {
               className="mt-6"
               aria-describedby={sizeError ? "size-error" : undefined}
             >
-              <legend className="mb-3 text-sm text-foreground">
+              <legend className="mb-3 text-body-sm text-foreground">
                 Size: <span className="font-semibold">{size || "chưa chọn"}</span>
               </legend>
               <div className="flex flex-wrap gap-2">
@@ -332,13 +335,13 @@ function ProductDetail() {
                         setSizeError(false);
                       }}
                       className={cn(
-                        "inline-flex min-h-11 min-w-12 items-center justify-center border px-3 text-sm transition-colors",
+                        "inline-flex min-h-11 min-w-12 items-center justify-center rounded-md bg-card px-3.5 text-body transition-[box-shadow,background-color,color] duration-150 ease-standard",
                         s === size
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border text-foreground hover:border-foreground",
+                          ? "bg-accent font-semibold text-accent-foreground shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
+                          : "text-foreground shadow-[inset_0_0_0_1px_var(--color-border)] hover:shadow-[inset_0_0_0_1px_var(--color-foreground)]",
                         !ok &&
-                          "cursor-not-allowed text-muted-foreground line-through opacity-50 hover:border-border",
-                        sizeError && !size && "border-destructive",
+                          "cursor-not-allowed bg-muted text-muted-foreground line-through hover:shadow-[inset_0_0_0_1px_var(--color-border)]",
+                        sizeError && !size && "shadow-[inset_0_0_0_1.5px_var(--color-destructive)]",
                       )}
                     >
                       {s}
@@ -348,7 +351,7 @@ function ProductDetail() {
                 })}
               </div>
               {sizeError && (
-                <p id="size-error" role="alert" className="mt-2 text-sm text-destructive">
+                <p id="size-error" role="alert" className="mt-2 text-body-sm text-destructive">
                   Bạn chọn size trước khi thêm vào giỏ nhé.
                 </p>
               )}
@@ -358,8 +361,8 @@ function ProductDetail() {
           <div className="mt-8 hidden gap-3 md:flex">
             <Button
               variant="primary"
-              size="md"
-              className="h-12 flex-1"
+              size="lg"
+              className="flex-1"
               disabled={productOut || variantOut || adding}
               onClick={() => void add()}
             >
@@ -367,8 +370,8 @@ function ProductDetail() {
             </Button>
             <Button
               variant="secondary"
-              size="md"
-              className="h-12"
+              size="lg"
+
               disabled={productOut || variantOut || adding}
               onClick={() => void add(true)}
             >
@@ -376,41 +379,35 @@ function ProductDetail() {
             </Button>
           </div>
 
-          <ul className="mt-8 grid gap-3 hairline-t pt-6 text-sm text-foreground">
+          <ul className="mt-8 grid gap-3 rounded-lg bg-secondary p-5 text-body-sm text-foreground">
             <li className="flex items-start gap-3">
-              <Truck className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <Truck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
               Miễn phí vận chuyển cho đơn từ {formatPrice(FREE_SHIPPING_THRESHOLD)}
             </li>
             <li className="flex items-start gap-3">
-              <RotateCcw
-                className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
+              <RotateCcw className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
               Đổi trả miễn phí trong 30 ngày
             </li>
             <li className="flex items-start gap-3">
-              <Wallet
-                className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground"
-                aria-hidden="true"
-              />
+              <Wallet className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
               Thanh toán khi nhận hàng (COD)
             </li>
           </ul>
 
           <section className="mt-10" aria-labelledby="desc-heading">
-            <h2 id="desc-heading" className="font-display text-xl text-foreground">
+            <h2 id="desc-heading" className="text-h3 text-foreground">
               Mô tả sản phẩm
             </h2>
-            <p className="measure mt-3 whitespace-pre-line text-base text-muted-foreground">
+            <p className="measure mt-3 whitespace-pre-line text-body-lg text-muted-foreground">
               {product.description || "Thông tin mô tả đang được cập nhật."}
             </p>
           </section>
 
           <section className="mt-8" aria-labelledby="spec-heading">
-            <h2 id="spec-heading" className="font-display text-xl text-foreground">
+            <h2 id="spec-heading" className="text-h3 text-foreground">
               Thông tin chi tiết
             </h2>
-            <dl className="mt-3 grid grid-cols-[8rem_1fr] gap-y-2 text-sm">
+            <dl className="mt-3 grid grid-cols-[8rem_1fr] gap-y-2 text-body-sm">
               <dt className="text-muted-foreground">Danh mục</dt>
               <dd className="text-foreground">{product.category}</dd>
               {product.colors.length > 0 && (
@@ -438,10 +435,10 @@ function ProductDetail() {
 
       {related.length > 0 && (
         <section className="container-shop section-y" aria-labelledby="related-heading">
-          <h2 id="related-heading" className="font-display text-2xl text-foreground">
+          <h2 id="related-heading" className="text-h2 text-foreground">
             Có thể bạn cũng thích
           </h2>
-          <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-4 md:gap-x-6 md:gap-y-12">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -449,18 +446,18 @@ function ProductDetail() {
         </section>
       )}
 
-      <div className="fixed inset-x-0 bottom-14 z-30 hairline-t bg-background px-4 py-3 md:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 bg-background/95 px-4 py-3 shadow-[0_-1px_0_var(--color-border),0_-8px_24px_rgb(31_36_33/0.06)] backdrop-blur-md md:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
-            <p className="tabular text-base font-semibold text-foreground">{shownPrice}</p>
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="text-price text-foreground">{shownPrice}</p>
+            <p className="truncate text-caption text-muted-foreground">
               {[color && colorLabel(color), size || "chưa chọn size"].filter(Boolean).join(" · ")}
             </p>
           </div>
           <Button
             variant="primary"
-            size="md"
-            className="ml-auto h-12 px-6"
+            size="lg"
+            className="ml-auto px-6"
             disabled={productOut || variantOut || adding}
             onClick={() => void add()}
           >

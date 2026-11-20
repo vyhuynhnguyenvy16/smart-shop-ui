@@ -6,12 +6,12 @@ export function BottomNav() {
   const { count } = cartTotals(detailedCart(useCart()));
 
   const item =
-    "flex min-h-14 flex-1 flex-col items-center justify-center gap-1 text-xs text-muted-foreground transition-colors [&.active]:text-primary";
+    "flex min-h-16 flex-1 flex-col items-center justify-center gap-1 text-caption font-medium text-muted-foreground transition-colors duration-150 [&.active]:text-primary";
 
   return (
     <nav
       aria-label="Điều hướng nhanh"
-      className="fixed inset-x-0 bottom-0 z-40 flex hairline-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_0_var(--color-border)] backdrop-blur-md md:hidden"
     >
       <Link to="/" className={item} activeOptions={{ exact: true }}>
         <Home className="h-5 w-5" aria-hidden="true" />

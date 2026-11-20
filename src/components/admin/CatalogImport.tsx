@@ -127,7 +127,7 @@ export function CatalogImport({
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
-        <h2 id="import-title" className="font-display text-2xl text-foreground">
+        <h2 id="import-title" className="text-h2 text-foreground">
           Áp dụng ảnh & mô tả tiếng Việt
         </h2>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">

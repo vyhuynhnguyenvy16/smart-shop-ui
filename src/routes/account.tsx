@@ -75,9 +75,7 @@ function AccountPage() {
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <h1 className="font-display text-3xl text-foreground md:text-4xl">
-        Xin chào, {profile.fullName || "bạn"}
-      </h1>
+      <h1 className="text-h1 text-foreground">Xin chào, {profile.fullName || "bạn"}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{profile.email}</p>
 
       {error && (
@@ -151,7 +149,7 @@ function AccountPage() {
         <form onSubmit={saveProfile} className="mt-6 max-w-lg hairline bg-card p-6">
           <div className="flex items-center gap-3">
             <User className="h-5 w-5 text-muted-foreground" />
-            <h2 className="font-display text-xl text-foreground">Thông tin cá nhân</h2>
+            <h2 className="text-h3 text-foreground">Thông tin cá nhân</h2>
           </div>
           <div className="mt-4 grid gap-4">
             <div>
@@ -162,7 +160,7 @@ function AccountPage() {
                 id="fullName"
                 value={profile.fullName}
                 onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-                className="h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground"
+                className="h-12 w-full rounded-md border border-input bg-card px-3.5 text-base outline-none transition-[border-color,box-shadow] duration-150 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_20%,transparent)]"
               />
             </div>
             <div>
@@ -173,7 +171,7 @@ function AccountPage() {
                 id="email"
                 value={profile.email}
                 readOnly
-                className="h-12 w-full border border-input bg-muted px-4 text-base text-muted-foreground"
+                className="h-12 w-full rounded-md border border-input bg-muted px-3.5 text-base text-muted-foreground"
               />
             </div>
             <div>
@@ -184,7 +182,7 @@ function AccountPage() {
                 id="phone"
                 value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                className="h-12 w-full border border-input bg-background px-4 text-base outline-none focus:border-foreground"
+                className="h-12 w-full rounded-md border border-input bg-card px-3.5 text-base outline-none transition-[border-color,box-shadow] duration-150 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-primary)_20%,transparent)]"
               />
             </div>
             <Button type="submit" variant="primary" size="md" disabled={saving}>
@@ -198,7 +196,7 @@ function AccountPage() {
         <div className="mt-6 max-w-lg hairline bg-card p-6">
           <div className="flex items-center gap-3">
             <MapPin className="h-5 w-5 text-muted-foreground" />
-            <h2 className="font-display text-xl text-foreground">Địa chỉ giao hàng</h2>
+            <h2 className="text-h3 text-foreground">Địa chỉ giao hàng</h2>
           </div>
           {addresses.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
@@ -207,7 +205,7 @@ function AccountPage() {
           ) : (
             <ul className="mt-4 grid gap-4">
               {addresses.map((a) => (
-                <li key={a.id} className="border border-border p-4 text-base">
+                <li key={a.id} className="rounded-lg border border-border p-4 text-base">
                   <p className="font-semibold text-foreground">
                     {a.recipientName} · {a.phone}
                     {a.isDefault && (

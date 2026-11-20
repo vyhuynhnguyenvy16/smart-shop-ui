@@ -58,7 +58,7 @@ function OrderListPage() {
 
   return (
     <div className="container-shop section-y pb-24 md:pb-12">
-      <h1 className="font-display text-3xl text-foreground md:text-4xl">Đơn hàng của tôi</h1>
+      <h1 className="text-h1 text-foreground">Đơn hàng của tôi</h1>
 
       {error && (
         <p className="mt-4 border-l-2 border-destructive bg-destructive/10 px-4 py-3 text-sm text-destructive">
