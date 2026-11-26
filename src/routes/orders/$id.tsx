@@ -7,8 +7,18 @@ import {
   cancelOrder,
   getApiErrorMessage,
   getOrderById,
+  getPaymentInfo,
+  startMomoPayment,
   type OrderResponse,
+  type PaymentInfo,
 } from "@/lib/api-client";
+import {
+  METHOD_LABEL,
+  PAYMENT_STATUS_LABEL,
+  failureMessage,
+  paymentBadgeClass,
+  useCountdown,
+} from "@/lib/payments";
 import { STATUS_LABEL, StatusBadgeClass, type OrderStatus } from "@/lib/orders";
 import { formatPrice } from "@/lib/products";
 
@@ -31,12 +41,35 @@ function OrderDetailPage() {
   const { user, loading } = useRequireAuth();
   const [order, setOrder] = useState<OrderResponse | null>(null);
   const [error, setError] = useState("");
+  const [payment, setPayment] = useState<PaymentInfo | null>(null);
+  const [paying, setPaying] = useState(false);
 
   const load = useCallback(() => {
     void getOrderById(Number(id))
-      .then((data) => setOrder(data ?? null))
+      .then((data) => {
+        setOrder(data ?? null);
+        return data?.paymentMethod === "momo"
+          ? getPaymentInfo(data.id).then(setPayment)
+          : undefined;
+      })
       .catch((reason) => setError(getApiErrorMessage(reason, "Không tải được đơn hàng.")));
   }, [id]);
+
+  const payAgain = async () => {
+    if (!order || paying) return;
+    setPaying(true);
+    setError("");
+    try {
+      const link = await startMomoPayment(order.id);
+      window.location.assign(link.payUrl);
+    } catch (reason) {
+      setError(
+        getApiErrorMessage(reason, "Chưa tạo được link thanh toán. Bạn thử lại sau ít phút."),
+      );
+      setPaying(false);
+      load();
+    }
+  };
 
   useEffect(() => {
     if (user) load();
@@ -110,10 +143,20 @@ function OrderDetailPage() {
               <dt className="text-muted-foreground">Tạm tính</dt>
               <dd className="font-semibold">{formatPrice(itemsTotal)}</dd>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Phương thức</dt>
-              <dd className="font-semibold uppercase">{order.paymentMethod}</dd>
+              <dd className="text-right font-semibold">{METHOD_LABEL[order.paymentMethod]}</dd>
             </div>
+            {order.paymentMethod === "momo" && (
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Trạng thái</dt>
+                <dd>
+                  <span className={paymentBadgeClass(order.paymentStatus)}>
+                    {PAYMENT_STATUS_LABEL[order.paymentStatus]}
+                  </span>
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between border-t border-border pt-2">
               <dt className="font-semibold">Tổng</dt>
               <dd className="tabular text-xl font-semibold text-foreground">
@@ -122,7 +165,11 @@ function OrderDetailPage() {
             </div>
           </dl>
 
-          {status === "pending" && (
+          {payment?.canRetry && (
+            <MomoRetry payment={payment} paying={paying} onPay={() => void payAgain()} />
+          )}
+
+          {status === "pending" && order.paymentStatus !== "paid" && (
             <Button
               variant="secondary"
               size="md"
@@ -146,6 +193,37 @@ function OrderDetailPage() {
           </Button>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function MomoRetry({
+  payment,
+  paying,
+  onPay,
+}: {
+  payment: PaymentInfo;
+  paying: boolean;
+  onPay: () => void;
+}) {
+  const left = useCountdown(payment.expiresAt);
+  return (
+    <div className="mt-6 grid gap-3">
+      {payment.lastAttemptStatus === "failed" && (
+        <p className="text-body-sm text-muted-foreground">
+          {failureMessage(payment.lastResultCode)}
+        </p>
+      )}
+      {left && left.ms > 0 && (
+        <p className="text-body-sm text-muted-foreground" aria-live="off">
+          Đơn được giữ thêm{" "}
+          <span className="tabular font-semibold text-foreground">{left.label}</span>. Sau đó đơn sẽ
+          tự hủy và hàng được trả lại kho.
+        </p>
+      )}
+      <Button variant="primary" size="md" className="w-full" onClick={onPay} disabled={paying}>
+        {paying ? "Đang mở MoMo…" : "Thanh toán MoMo"}
+      </Button>
     </div>
   );
 }

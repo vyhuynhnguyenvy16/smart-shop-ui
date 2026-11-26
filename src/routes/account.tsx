@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { STATUS_LABEL, StatusBadgeClass, getOrderPage, type Order } from "@/lib/orders";
 import { formatPrice } from "@/lib/products";
 import { cn } from "@/lib/utils";
+import { paymentBadgeClass } from "@/lib/payments";
 import {
   getAddresses,
   getApiErrorMessage,
@@ -119,7 +120,17 @@ function AccountPage() {
                 <Package className="h-5 w-5 text-muted-foreground" />
                 <span className="text-base font-semibold text-foreground">#{o.id}</span>
                 <span className="text-sm text-muted-foreground">{o.date}</span>
-                <span className={cn(StatusBadgeClass(o.status), "ml-auto")}>
+                {o.paymentMethod === "momo" && o.paymentStatus === "pending" && (
+                  <span className={cn(paymentBadgeClass(o.paymentStatus), "ml-auto")}>
+                    Chờ thanh toán MoMo
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    StatusBadgeClass(o.status),
+                    o.paymentMethod === "momo" && o.paymentStatus === "pending" ? "" : "ml-auto",
+                  )}
+                >
                   {STATUS_LABEL[o.status]}
                 </span>
               </div>

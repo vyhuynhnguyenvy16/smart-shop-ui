@@ -1,4 +1,9 @@
-import { getOrders, type OrderResponse } from "./api-client";
+import {
+  getOrders,
+  type OrderResponse,
+  type PaymentMethod,
+  type PaymentStatus,
+} from "./api-client";
 
 export type OrderStatus = "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
 
@@ -33,6 +38,8 @@ export type Order = {
   date: string;
   total: number;
   status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   items: { title: string; variant: string; qty: number; price: number }[];
 };
 
@@ -45,6 +52,8 @@ export function adaptOrder(order: OrderResponse): Order {
     date: order.createdAt,
     total: order.totalAmount,
     status: ORDER_STATUSES.includes(status) ? status : "pending",
+    paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus,
     items: order.items.map((item) => ({
       title: item.productNameSnapshot,
       variant: [item.colorSnapshot, item.sizeSnapshot].filter(Boolean).join(" / "),

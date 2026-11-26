@@ -108,10 +108,15 @@ export type OrderResponse = {
   shippingPhone: string;
   shippingAddressLine: string;
   shippingCity: string;
-  paymentMethod: string;
+  /** "cod" or "momo". */
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   items: OrderItemResponse[];
   createdAt: string;
 };
+
+export type PaymentMethod = "cod" | "momo";
+export type PaymentStatus = "not_required" | "pending" | "paid" | "expired" | "cancelled";
 
 export type ApiError = Error & { status?: number };
 
@@ -521,7 +526,9 @@ export async function deleteCartItem(itemId: number) {
 
 /* --------------------------------- Orders --------------------------------- */
 
-type RawOrder = Omit<OrderResponse, "paymentMethod" | "items"> & {
+type RawOrder = Omit<OrderResponse, "paymentMethod" | "paymentStatus" | "items"> & {
+  paymentMethod?: string;
+  paymentStatus?: string;
   items: Omit<OrderItemResponse, "imageKeySnapshot">[];
 };
 
@@ -529,25 +536,78 @@ function mapOrder(o: RawOrder): OrderResponse {
   return {
     ...o,
     totalAmount: Number(o.totalAmount),
-    paymentMethod: "cod",
+    paymentMethod: o.paymentMethod?.toLowerCase() === "momo" ? "momo" : "cod",
+    paymentStatus: (o.paymentStatus?.toLowerCase() ?? "not_required") as PaymentStatus,
     items: (o.items ?? []).map((i) => ({ ...i, imageKeySnapshot: "", unitPriceSnapshot: Number(i.unitPriceSnapshot), subtotal: Number(i.subtotal) })),
   };
 }
 
-/** Payment is not collected online; the backend creates the order and clears the cart. */
-export async function createOrder(body: {
-  shippingRecipientName: string;
-  shippingPhone: string;
-  shippingAddressLine: string;
-  shippingCity: string;
-}) {
+/**
+ * Creates the order and reserves stock. With MoMo the order then waits for payment (see startMomoPayment);
+ * with COD it is paid on delivery.
+ */
+export async function createOrder(
+  body: {
+    shippingRecipientName: string;
+    shippingPhone: string;
+    shippingAddressLine: string;
+    shippingCity: string;
+    paymentMethod: PaymentMethod;
+  },
+  idempotencyKey: string = crypto.randomUUID(),
+) {
   const order = await request<RawOrder>("/api/orders", {
     method: "POST",
     auth: true,
-    headers: { "Idempotency-Key": crypto.randomUUID() },
-    body,
+    headers: { "Idempotency-Key": idempotencyKey },
+    body: { ...body, paymentMethod: body.paymentMethod.toUpperCase() },
   });
-  return { id: order.id };
+  return { id: order.id, totalAmount: Number(order.totalAmount) };
+}
+
+/* -------------------------------- Payments -------------------------------- */
+
+export type PaymentLink = { orderId: number; payUrl: string; expiresAt: string };
+
+/** Returns MoMo's payment page URL. Calling it again reuses the same link while it is still payable. */
+export async function startMomoPayment(orderId: number) {
+  return request<PaymentLink>(`/api/orders/${orderId}/payments/momo`, {
+    method: "POST",
+    auth: true,
+  });
+}
+
+export type PaymentInfo = {
+  orderId: number;
+  orderStatus: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  amount: number;
+  expiresAt: string | null;
+  paidAt: string | null;
+  lastAttemptStatus: "pending" | "succeeded" | "failed" | null;
+  lastResultCode: number | null;
+  canRetry: boolean;
+};
+
+type RawPaymentInfo = Omit<PaymentInfo, "method" | "status" | "lastAttemptStatus" | "amount"> & {
+  method: string;
+  status: string;
+  lastAttemptStatus: string | null;
+  amount: number | string;
+};
+
+/** The real payment state. Never trust MoMo's redirect parameters; ask the server. */
+export async function getPaymentInfo(orderId: number): Promise<PaymentInfo> {
+  const raw = await request<RawPaymentInfo>(`/api/orders/${orderId}/payment`, { auth: true });
+  return {
+    ...raw,
+    method: raw.method.toLowerCase() as PaymentMethod,
+    status: raw.status.toLowerCase() as PaymentStatus,
+    lastAttemptStatus: (raw.lastAttemptStatus?.toLowerCase() ??
+      null) as PaymentInfo["lastAttemptStatus"],
+    amount: Number(raw.amount),
+  };
 }
 
 export async function getOrders(params?: { page?: number; size?: number }) {

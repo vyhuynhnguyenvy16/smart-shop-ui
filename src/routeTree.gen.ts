@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as CheckoutMomoReturnRouteImport } from './routes/checkout/momo-return'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
 import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as OrdersIdRouteImport } from './routes/orders/$id'
@@ -69,6 +70,11 @@ const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutMomoReturnRoute = CheckoutMomoReturnRouteImport.update({
+  id: '/checkout/momo-return',
+  path: '/checkout/momo-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout/success',
   path: '/checkout/success',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/checkout/momo-return': typeof CheckoutMomoReturnRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/orders/$id': typeof OrdersIdRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/checkout/momo-return': typeof CheckoutMomoReturnRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/orders/$id': typeof OrdersIdRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/products': typeof AdminProductsRoute
+  '/checkout/momo-return': typeof CheckoutMomoReturnRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/orders/$id': typeof OrdersIdRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/orders'
     | '/admin/products'
+    | '/checkout/momo-return'
     | '/checkout/success'
     | '/orders/$id'
     | '/products/$slug'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/orders'
     | '/admin/products'
+    | '/checkout/momo-return'
     | '/checkout/success'
     | '/orders/$id'
     | '/products/$slug'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/orders'
     | '/admin/products'
+    | '/checkout/momo-return'
     | '/checkout/success'
     | '/orders/$id'
     | '/products/$slug'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminProductsRoute: typeof AdminProductsRoute
+  CheckoutMomoReturnRoute: typeof CheckoutMomoReturnRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   OrdersIdRoute: typeof OrdersIdRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/momo-return': {
+      id: '/checkout/momo-return'
+      path: '/checkout/momo-return'
+      fullPath: '/checkout/momo-return'
+      preLoaderRoute: typeof CheckoutMomoReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/success': {
       id: '/checkout/success'
       path: '/checkout/success'
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminProductsRoute: AdminProductsRoute,
+  CheckoutMomoReturnRoute: CheckoutMomoReturnRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   OrdersIdRoute: OrdersIdRoute,
   ProductsSlugRoute: ProductsSlugRoute,
