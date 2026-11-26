@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Wallet } from "lucide-react";
+import { Smartphone, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cartTotals, clearCart, detailedCart, useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
@@ -11,8 +11,10 @@ import {
   createOrder,
   getAddresses,
   getApiErrorMessage,
+  startMomoPayment,
   type AddressResponse,
   type ApiError,
+  type PaymentMethod,
 } from "@/lib/api-client";
 import { useRequireAuth } from "@/lib/auth";
 import { pageHead } from "@/lib/seo";
@@ -22,12 +24,33 @@ export const Route = createFileRoute("/checkout/")({
   head: () =>
     pageHead({
       title: "Đặt hàng — Northline",
-      description: "Nhập địa chỉ giao hàng và xác nhận đơn, thanh toán khi nhận hàng.",
+      description:
+        "Nhập địa chỉ giao hàng, chọn thanh toán khi nhận hàng hoặc ví MoMo, rồi xác nhận đơn.",
       path: "/checkout",
       noindex: true,
     }),
   component: CheckoutPage,
 });
+
+const PAYMENT_OPTIONS: {
+  value: PaymentMethod;
+  title: string;
+  description: string;
+  icon: typeof Wallet;
+}[] = [
+  {
+    value: "cod",
+    title: "Thanh toán khi nhận hàng (COD)",
+    description: "Bạn trả tiền mặt cho nhân viên giao hàng khi nhận được đơn.",
+    icon: Wallet,
+  },
+  {
+    value: "momo",
+    title: "Ví MoMo",
+    description: "Bạn sẽ được chuyển sang MoMo để thanh toán. Đơn được giữ hàng trong 15 phút.",
+    icon: Smartphone,
+  },
+];
 
 /** Only what the order API accepts (POST /api/orders) — no unused fields to fill in. */
 type Fields = { fullName: string; phone: string; address: string; city: string };
@@ -73,6 +96,9 @@ function CheckoutPage() {
   const [saved, setSaved] = useState<AddressResponse[]>([]);
   const [selectedSaved, setSelectedSaved] = useState<string>("new");
   const [placing, setPlacing] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>("cod");
+  // One key per checkout visit: a retried "Đặt hàng" after a network error never creates a second order.
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [orderError, setOrderError] = useState("");
   const summaryRef = useRef<HTMLDivElement>(null);
   const [failedAttempt, setFailedAttempt] = useState(0);
@@ -145,22 +171,39 @@ function CheckoutPage() {
     setOrderError("");
     setPlacing(true);
     try {
-      const order = await createOrder({
-        shippingRecipientName: fields.fullName.trim(),
-        shippingPhone: fields.phone.replace(/[\s.-]/g, ""),
-        shippingAddressLine: fields.address.trim(),
-        shippingCity: fields.city.trim(),
-      });
+      const order = await createOrder(
+        {
+          shippingRecipientName: fields.fullName.trim(),
+          shippingPhone: fields.phone.replace(/[\s.-]/g, ""),
+          shippingAddressLine: fields.address.trim(),
+          shippingCity: fields.city.trim(),
+          paymentMethod: method,
+        },
+        idempotencyKey,
+      );
       await clearCart().catch(() => undefined);
-      void navigate({ to: "/checkout/success", search: { orderId: order.id } });
+      if (method === "cod") {
+        void navigate({ to: "/checkout/success", search: { orderId: order.id } });
+        return;
+      }
+      try {
+        const link = await startMomoPayment(order.id);
+        window.location.assign(link.payUrl);
+      } catch {
+        // The order exists and waits for payment: the result page offers "Thanh toán lại".
+        void navigate({ to: "/checkout/momo-return", search: { order: order.id } });
+      }
     } catch (reason) {
       const status = (reason as ApiError)?.status;
+      const message = getApiErrorMessage(reason, "");
       setOrderError(
-        status === 409
-          ? "Một số sản phẩm vừa hết hàng hoặc không đủ số lượng. Quay lại giỏ hàng để điều chỉnh nhé."
-          : status === 400
-            ? "Thông tin giao hàng chưa hợp lệ hoặc giỏ hàng trống. Kiểm tra lại giúp mình nhé."
-            : getApiErrorMessage(reason, "Chưa đặt được hàng. Bạn thử lại sau ít phút."),
+        status === 409 && method === "momo" && message.includes("MoMo")
+          ? `${message} Bạn có thể chọn thanh toán khi nhận hàng.`
+          : status === 409
+            ? "Một số sản phẩm vừa hết hàng hoặc không đủ số lượng. Quay lại giỏ hàng để điều chỉnh nhé."
+            : status === 400
+              ? "Thông tin giao hàng chưa hợp lệ hoặc giỏ hàng trống. Kiểm tra lại giúp mình nhé."
+              : getApiErrorMessage(reason, "Chưa đặt được hàng. Bạn thử lại sau ít phút."),
       );
     } finally {
       setPlacing(false);
@@ -354,18 +397,52 @@ function CheckoutPage() {
                 </p>
               </section>
 
-              <section className="hairline p-5" aria-labelledby="pay-heading">
-                <h2 id="pay-heading" className="text-body-sm font-semibold text-foreground">
-                  Thanh toán
-                </h2>
-                <p className="mt-2 flex items-center gap-3 text-base text-foreground">
-                  <Wallet className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                  Thanh toán khi nhận hàng (COD)
-                </p>
-                <p className="mt-1 text-body-sm text-muted-foreground">
-                  Bạn trả tiền mặt cho nhân viên giao hàng khi nhận được đơn.
-                </p>
-              </section>
+              <fieldset className="hairline p-5">
+                <legend className="float-left mb-3 w-full text-body-sm font-semibold text-foreground">
+                  Phương thức thanh toán
+                </legend>
+                <div className="clear-both grid gap-3">
+                  {PAYMENT_OPTIONS.map((option) => {
+                    const Icon = option.icon;
+                    const selected = method === option.value;
+                    return (
+                      <label
+                        key={option.value}
+                        className={cn(
+                          "flex min-h-11 cursor-pointer items-start gap-3 rounded-md border p-4 transition-[background-color,border-color] duration-150 ease-standard",
+                          selected
+                            ? "border-primary bg-accent"
+                            : "border-border bg-card hover:border-input",
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="payment-method"
+                          value={option.value}
+                          checked={selected}
+                          onChange={() => setMethod(option.value)}
+                          className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-primary)]"
+                        />
+                        <span className="grid gap-1">
+                          <span className="flex items-center gap-2 text-base font-medium text-foreground">
+                            <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                            {option.title}
+                          </span>
+                          <span className="text-body-sm text-muted-foreground">
+                            {option.description}
+                          </span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {method === "momo" && shipping > 0 && (
+                  <p className="mt-3 text-body-sm text-muted-foreground">
+                    MoMo thu tiền hàng {formatPrice(subtotal)}. Phí giao hàng{" "}
+                    {formatPrice(shipping)} trả khi nhận hàng.
+                  </p>
+                )}
+              </fieldset>
 
               {orderError && (
                 <p
@@ -395,7 +472,13 @@ function CheckoutPage() {
                   onClick={() => void placeOrder()}
                   disabled={placing || items.length === 0}
                 >
-                  {placing ? "Đang đặt hàng…" : `Đặt hàng · ${formatPrice(subtotal + shipping)}`}
+                  {placing
+                    ? method === "momo"
+                      ? "Đang chuyển sang MoMo…"
+                      : "Đang đặt hàng…"
+                    : method === "momo"
+                      ? `Thanh toán MoMo · ${formatPrice(subtotal)}`
+                      : `Đặt hàng · ${formatPrice(subtotal + shipping)}`}
                 </Button>
               </div>
             </div>

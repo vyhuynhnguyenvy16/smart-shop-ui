@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { paymentBadgeClass } from "@/lib/payments";
 import { useRequireAuth } from "@/lib/auth";
 import { cancelOrder, getApiErrorMessage } from "@/lib/api-client";
 import {
@@ -98,7 +99,17 @@ function OrderListPage() {
                 <span className="text-sm text-muted-foreground">
                   {new Date(o.date).toLocaleDateString("vi-VN")}
                 </span>
-                <span className={cn(StatusBadgeClass(o.status), "ml-auto")}>
+                {o.paymentMethod === "momo" && o.paymentStatus === "pending" && (
+                  <span className={cn(paymentBadgeClass(o.paymentStatus), "ml-auto")}>
+                    Chờ thanh toán MoMo
+                  </span>
+                )}
+                <span
+                  className={cn(
+                    StatusBadgeClass(o.status),
+                    o.paymentMethod === "momo" && o.paymentStatus === "pending" ? "" : "ml-auto",
+                  )}
+                >
                   {STATUS_LABEL[o.status]}
                 </span>
               </div>
